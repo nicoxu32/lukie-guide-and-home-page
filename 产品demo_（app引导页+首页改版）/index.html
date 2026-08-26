@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lukie 交互原型 · 首次引导 + 首页状态机</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:#f2f1ec;min-height:100vh;display:flex;gap:32px;align-items:flex-start;justify-content:center;padding:32px 24px;color:#222}
+.panel{width:230px;flex:none;position:sticky;top:32px}
+.panel h2{font-size:15px;font-weight:600;margin-bottom:12px}
+.panel .grp{font-size:12px;color:#888;margin:14px 0 6px}
+.pbtn{display:block;width:100%;text-align:left;font-size:13px;padding:8px 12px;margin-bottom:6px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;color:#333;transition:all .15s}
+.pbtn:hover{border-color:#f0913c}
+.pbtn.on{background:#222;color:#fff;border-color:#222}
+.pnote{font-size:11px;color:#999;line-height:1.6;margin-top:14px}
+.phone{width:390px;height:844px;flex:none;background:#faf8f4;border-radius:48px;border:10px solid #1a1a1a;overflow:hidden;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.statusbar{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:14px;font-weight:600;background:transparent;position:relative;z-index:5}
+.scr{position:absolute;inset:0;padding-top:44px;display:none;flex-direction:column;background:#faf8f4;animation:fadein .35s}
+.scr.on{display:flex}
+.splash-screen{z-index:7;padding:0;background:#eee9ff;animation:none}
+.splash-screen img{display:block;width:100%;height:100%;object-fit:cover}
+@keyframes fadein{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+.dots{display:flex;gap:6px;justify-content:center;padding:14px 0}
+.dots i{width:6px;height:6px;border-radius:3px;background:#e2ded6;transition:all .2s}
+.dots i.on{width:18px;background:#f0913c}
+.ob-illus{height:220px;display:flex;align-items:center;justify-content:center}
+.ob-body{padding:8px 32px;flex:1}
+.ob-title{font-size:22px;font-weight:700;line-height:1.35;margin-bottom:10px}
+.ob-text{font-size:14px;line-height:1.7;color:#6b6660}
+.ob-text small{display:block;font-size:11px;color:#a09a90;margin-top:10px;line-height:1.6}
+#s11 .ob-illus{height:248px;margin-top:30px;padding:6px 14px 0}
+#s11 .welcome-hero{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 12px 20px rgba(87,66,51,.12))}
+#s11 .ob-body{padding:12px 32px 0}
+#s11 .ob-title{font-size:23px;line-height:1.42;margin-bottom:14px;letter-spacing:-.2px}
+.welcome-copy{font-size:14px;line-height:1.75;color:#6b6660}
+.welcome-belief{margin-top:15px;padding-left:12px;border-left:3px solid #f0913c;font-size:14px;font-weight:600;line-height:1.65;color:#3f3a34}
+.welcome-note{margin-top:16px;font-size:11px;line-height:1.6;color:#a09a90}
+.ob-foot{padding:16px 24px 30px}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:16px;font-size:16px;font-weight:600;background:#222;color:#fff;cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:#8a857e;font-weight:500;font-size:14px;padding:10px}
+.btn.org{background:#171717}
+.btn:disabled{background:#f6c79d;color:rgba(255,255,255,.88);cursor:not-allowed;transform:none;box-shadow:none}
+#s15 .btn:disabled{background:#b9b9b9;color:rgba(255,255,255,.92)}
+.skip{position:absolute;top:52px;right:20px;font-size:13px;color:#a09a90;background:none;border:none;cursor:pointer;z-index:6}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:#a09a90;margin-bottom:6px}
+.field input,.field select{width:100%;padding:13px 14px;font-size:16px;border:1.5px solid #e5e1d8;border-radius:12px;background:#fff;outline:none}
+.field input:focus{border-color:#f0913c}
+.login-body{padding:14px 28px 6px;overflow-y:auto}
+.login-brand{text-align:center;margin:4px 0 24px}
+.login-logo{font-size:42px;font-weight:800;letter-spacing:-2px;color:#242139;line-height:1}
+.login-brand p{font-size:13px;color:#8c8795;margin-top:10px}
+.login-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#8c8795;margin-bottom:7px}
+.login-label-note{font-size:10px;color:#b0a9b4;font-weight:400}
+.login-input{display:flex;align-items:center;height:50px;border:1.5px solid #e5e1d8;border-radius:14px;background:#fff;overflow:hidden;transition:border-color .2s}
+.login-input:focus-within{border-color:#f0913c}
+.login-prefix{font-size:14px;font-weight:600;color:#393542;padding:0 12px 0 14px;border-right:1px solid #eee9e1}
+.login-input input{min-width:0;flex:1;height:100%;border:none;background:transparent;padding:0 13px;font-size:15px;outline:none}
+.code-send{flex:none;border:none;background:transparent;color:#e47f28;font-size:12px;font-weight:600;padding:8px 12px;cursor:pointer}
+.login-main{margin-top:18px}
+.login-divider{display:flex;align-items:center;gap:12px;margin:20px 0 14px;color:#aaa4ae;font-size:12px}
+.login-divider::before,.login-divider::after{content:"";height:1px;background:#e9e4dc;flex:1}
+.social-login{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:46px;margin-bottom:10px;border:1.5px solid #e5e1d8;border-radius:14px;background:#fff;color:#302c38;font-size:14px;font-weight:600;cursor:pointer}
+.social-login:active{transform:scale(.98)}
+.google-mark{font-size:18px;font-weight:800;color:#4285f4}
+.apple-mark{font-size:21px;line-height:1;color:#111}
+.consents{margin-top:16px}
+.consent{display:flex;align-items:flex-start;gap:9px;margin-bottom:10px;color:#9a949f;font-size:10.5px;line-height:1.55}
+.consent input{width:17px;height:17px;flex:none;margin-top:0;accent-color:#f0913c}
+.consent a{color:#67616c;text-decoration:underline;cursor:pointer}
+.guardian-body{display:flex;flex-direction:column;min-height:0;padding:20px 24px 18px;overflow-y:auto;background:#f2edff}
+.guardian-title{font-size:23px;font-weight:750;line-height:1.4;color:#2b2831;margin-bottom:10px}
+.guardian-intro{font-size:13px;color:#706977;line-height:1.75;margin-bottom:8px}
+.guardian-illustration{display:block;width:min(100%,340px);height:245px;margin:auto;object-fit:contain;object-position:center;filter:drop-shadow(0 12px 18px rgba(111,82,62,.1))}
+.legal-summary{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;padding:14px;border-radius:16px;background:#fff9ed;border:1px solid #f1dfbd;color:#665849;font-size:11px;line-height:1.6}
+.legal-summary b{font-size:13px;color:#3d352e}
+.legal-lead{background:#fff;border-radius:18px;padding:17px 16px;box-shadow:0 2px 10px rgba(79,66,126,.05)}
+.legal-expand{width:100%;margin:-2px 0 2px;padding:12px;border:1px solid #dcd2f2;border-radius:13px;background:#fff;color:#6954ad;font-size:12px;font-weight:650;cursor:pointer}
+.legal-expand::after{content:"⌄";display:inline-block;margin-left:7px;transition:transform .2s}
+.legal-expand.on::after{transform:rotate(180deg)}
+.legal-details{display:none;flex-direction:column;gap:12px}
+.legal-details.on{display:flex}
+.legal-card{display:flex;flex-direction:column;gap:12px}
+.legal-card[hidden]{display:none}
+.legal-section{background:#fff;border-radius:18px;padding:17px 16px;box-shadow:0 2px 10px rgba(79,66,126,.05)}
+.legal-card h3{font-size:14px;color:#25212b;margin:0 0 9px;line-height:1.45}
+.legal-card p,.legal-card li{font-size:11.5px;line-height:1.75;color:#67616b}
+.legal-card p+p{margin-top:7px}
+.legal-card ul{padding-left:17px;margin-top:6px}
+.legal-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:9.5px;line-height:1.45;color:#67616b}
+.legal-table th,.legal-table td{border:1px solid #e9e4dc;padding:6px 5px;text-align:left;vertical-align:top}
+.legal-table th{background:#faf7f2;color:#45404a;font-weight:650}
+.guardian-foot{flex:none;padding:12px 24px 28px;background:#fff;border-top:1px solid #ebe5f6;box-shadow:0 -8px 22px rgba(62,48,110,.07)}
+.guardian-foot .consent{margin-bottom:8px;color:#625c67;font-size:10.5px}
+.guardian-foot .btn{margin-top:12px;font-size:14px}
+.switchrow{display:flex;justify-content:space-between;align-items:flex-start;padding:13px 0;border-bottom:1px solid #f0ede6;font-size:14px}
+.switchrow .desc{font-size:11px;color:#a09a90;margin-top:3px;line-height:1.5;max-width:250px}
+.sw{width:44px;height:26px;border-radius:13px;background:#e2ded6;position:relative;flex:none;cursor:pointer;transition:background .2s}
+.sw::after{content:"";position:absolute;width:22px;height:22px;border-radius:11px;background:#fff;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.sw.on{background:#f0913c}.sw.on::after{left:20px}
+.code-input{display:flex;gap:8px;justify-content:center;margin:18px 0}
+.code-input input{width:56px;height:64px;font-size:26px;font-weight:700;text-align:center;border:1.5px solid #e5e1d8;border-radius:14px;background:#fff;outline:none}
+.code-input input:focus{border-color:#f0913c}
+.wifirow{display:flex;justify-content:space-between;align-items:center;padding:13px 4px;border-bottom:1px solid #f0ede6;font-size:15px;cursor:pointer}
+.wifirow .lock{font-size:12px;color:#a09a90}
+.warn24{display:flex;gap:8px;background:#fdf1e3;border-radius:12px;padding:10px 12px;font-size:12px;color:#b06a1e;line-height:1.5;margin:12px 0}
+.bind-ready{overflow-y:auto;padding:12px 22px 10px;background:radial-gradient(circle at 84% 8%,rgba(255,190,202,.52),transparent 31%),radial-gradient(circle at 5% 35%,rgba(190,211,255,.58),transparent 36%),linear-gradient(180deg,#fbf1f6 0%,#f1edff 100%)}
+.bind-success{text-align:center;margin:2px 0 16px}
+.bind-success-row{display:flex;align-items:center;justify-content:center;gap:10px}
+.success-orb{width:44px;height:44px;flex:none;border-radius:50%;background-image:url('assets/registration-success.png');background-repeat:no-repeat;background-size:210% auto;background-position:50% 7%;box-shadow:0 7px 18px rgba(112,88,232,.2)}
+.bind-success h2{font-size:21px;line-height:1.35;color:#272330}
+.bind-guide-title{display:flex;align-items:center;gap:8px;margin-top:15px;color:#3f384d;font-size:15px;font-weight:750;white-space:nowrap}
+.bind-guide-title::before,.bind-guide-title::after{content:"";height:1.5px;flex:1;background:rgba(102,83,164,.28)}
+.bind-success p{font-size:13.5px;line-height:1.65;color:#6f6877;margin-top:8px;font-weight:500}
+.bind-steps{display:flex;flex-direction:column;gap:12px}
+.bind-step{display:flex;align-items:stretch;min-height:140px;background:rgba(255,255,255,.94);border:1px solid rgba(255,255,255,.85);border-radius:20px;overflow:hidden;box-shadow:0 5px 18px rgba(81,66,122,.08)}
+.bind-step-main{display:flex;align-items:flex-start;gap:10px;flex:1;padding:19px 10px 16px 14px}
+.bind-num{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;background:#eee9ff;color:#6e58d9;font-size:12px;font-weight:750}
+.bind-copy{flex:1;padding-top:2px}
+.bind-copy b{display:block;font-size:14px;color:#332f39;margin-bottom:3px}
+.bind-copy span{display:block;font-size:11.5px;line-height:1.55;color:#827c88}
+.bind-shot{width:112px;flex:none;margin:11px 11px 11px 0;border-radius:15px;background-repeat:no-repeat;background-position:center;background-size:cover;box-shadow:0 3px 12px rgba(78,62,125,.09)}
+.bind-shot.power{background-image:url('assets/binding-power-on.png')}
+.bind-shot.hotspot{background-image:url('assets/binding-lukie-hotspot.png')}
+.bind-shot.wifi{background-image:url('assets/binding-home-wifi.png')}
+.bind-tip{font-size:11px;line-height:1.6;color:#756e80;text-align:center;margin-top:13px}
+#s21 .ob-foot{flex:none;background:#f1edff;padding-top:10px;box-shadow:0 -8px 22px rgba(73,57,120,.06)}
+#s25{background:linear-gradient(180deg,#fbecf2 0%,#f0edff 100%)}
+.pair-body{padding:14px 22px 8px;overflow-y:auto}
+.pair-title{font-size:24px;font-weight:800;line-height:1.32;color:#25212d}
+.pair-subtitle{font-size:13px;line-height:1.6;color:#847d8c;margin-top:6px}
+.pair-hero{position:relative;height:250px;margin:16px 0 12px;overflow:hidden;border-radius:22px;background-image:url('assets/binding-code-reference.png');background-repeat:no-repeat;background-size:100% auto;background-position:center 38%;box-shadow:0 8px 25px rgba(104,76,126,.12)}
+.activation-screen-code{position:absolute;top:35px;left:50%;transform:translateX(-50%);min-width:142px;color:#7bffd8;font-family:"Arial Rounded MT Bold","SF Pro Rounded",ui-rounded,sans-serif;font-size:19px;font-weight:800;line-height:1;text-align:center;letter-spacing:4px;text-indent:4px;text-shadow:0 0 5px rgba(88,255,209,.95),0 0 11px rgba(50,224,180,.58)}
+.pair-code-card{background:rgba(255,255,255,.94);border-radius:20px;padding:15px 12px 13px;box-shadow:0 5px 18px rgba(84,67,126,.06)}
+.pair-code-title{text-align:center;font-size:14px;font-weight:700;color:#332e3b}
+#s25 .code-input{gap:7px;margin:13px 0 4px}
+#s25 .code-input input{width:42px;height:52px;border-color:#e7e0fa;border-radius:12px;font-size:22px}
+#s25 .ob-foot{background:#f0edff;padding-top:12px}
+.wifi-entry{margin:0 0 6px;color:#6757b5!important}
+#s15{background:#f7f3fb}
+#s15 .ob-body{padding:12px 20px 10px;overflow-y:auto}
+.activation-head{margin:4px 2px 18px}
+.activation-head-copy h2{font-size:23px;line-height:1.35;color:#202944}
+.activation-head-copy p{margin-top:7px;font-size:13px;line-height:1.6;color:#756e7d}
+.profile-card{background:#fff;border-radius:19px;padding:15px;margin-bottom:12px;box-shadow:0 4px 16px rgba(77,60,112,.055)}
+.profile-section-head{margin-bottom:13px}
+.profile-section-head h3{font-size:15px;color:#302b36;margin-bottom:4px}
+.profile-section-head p{font-size:11.5px;line-height:1.55;color:#928b96}
+.profile-card .field:last-child{margin-bottom:0}
+.profile-basics .field{display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:10px;margin-bottom:11px}
+.profile-basics .field label{margin:0;color:#716a75}
+.profile-basics .field input{min-width:0;padding:11px 12px;font-size:14px}
+.profile-basics .picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0}
+.profile-basics .pick{padding:10px 8px;text-align:center}
+.interest-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.interest-grid .pick{position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-width:0;padding:9px 5px;border-radius:14px;border-color:#ebe5ed;font-size:11.5px;text-align:center;white-space:nowrap}
+.interest-grid .pick::after{display:none}
+.interest-grid .pick.on{padding-right:20px;background:#fff0f6;border-color:#f5b9d2;color:#d93f83;font-weight:650}
+.interest-grid .pick.on::after{content:"✓";position:absolute;top:50%;right:5px;display:flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#ef5aa0;color:#fff;font-size:10px;transform:translateY(-50%)}
+.profile-note{font-size:10.5px;line-height:1.6;color:#9a939e;padding:0 3px 6px}
+#s15 .ob-foot{flex:none;background:#f7f3fb;padding-top:10px;box-shadow:0 -8px 20px rgba(60,48,84,.05)}
+#s15 .ob-foot .ghost{font-size:12px;padding:8px}
+/* ===== s31 交接仪式 · 手绘图主体插图模式 ===== */
+#s31{background:radial-gradient(circle at 86% 12%,rgba(255,193,211,.52),transparent 31%),radial-gradient(circle at 5% 48%,rgba(202,213,255,.58),transparent 36%),linear-gradient(180deg,#fff8f5,#f3efff)}
+.story-body{padding:8px 18px 12px;overflow-y:auto;display:flex;flex-direction:column}
+.story-intro{text-align:center;padding:14px 10px 12px}
+.story-intro h2{font-size:20px;font-weight:700;line-height:1.42;color:#2d2832;margin-bottom:5px}
+.story-intro p{font-size:13px;color:#6f6877;font-weight:500}
+.story-illustration{flex:1;display:flex;align-items:center;justify-content:center;padding:0 8px;overflow:hidden}
+.story-illustration{position:relative;isolation:isolate;perspective:900px}
+.story-illustration::before,.story-illustration::after{content:"";position:absolute;width:calc(100% - 34px);height:calc(100% - 18px);border-radius:18px;background:#fffaf0;box-shadow:0 10px 18px rgba(101,73,62,.12);z-index:-2}
+.story-illustration::before{transform:translate(7px,8px) rotate(2.2deg);opacity:.72}
+.story-illustration::after{transform:translate(-5px,4px) rotate(-1.4deg);opacity:.9;z-index:-1}
+.story-handdrawn-img{display:block;width:100%;max-width:100%;height:auto;border-radius:16px;border:1px solid rgba(255,255,255,.8);box-shadow:0 16px 26px rgba(91,63,58,.22),0 2px 4px rgba(91,63,58,.12),inset 0 0 0 1px rgba(126,92,72,.08);transform:rotate(-.7deg) translateZ(18px);transform-origin:center center}
+#s31 .ob-foot{flex:none;background:rgba(249,243,251,.95);padding-top:10px;box-shadow:0 -8px 20px rgba(105,78,120,.06)}
+.spinner{width:44px;height:44px;border-radius:50%;border:4px solid #f0e4d5;border-top-color:#f0913c;animation:spin 1s linear infinite;margin:20px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.errbox{background:#fdeeee;border-radius:12px;padding:12px 14px;font-size:13px;color:#b3402e;line-height:1.6;margin:12px 0;display:none}
+.errbox.on{display:block;animation:fadein .3s}
+.home-scroll{flex:1;overflow-y:auto;padding:0 0 90px;background:#f6f4fb}
+#home{background:#f6f4fb}
+.greet{padding:6px 4px 12px}
+.greet .date{font-size:12px;color:#a09a90}
+.greet h1{font-size:24px;font-weight:700;margin-top:2px}
+.zcard{background:#fff;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.04);position:relative}
+.zcard h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.zcard p{font-size:13px;line-height:1.6;color:#6b6660}
+.riskbar{background:#fdf1e3;border:1px solid #f3d9b8;border-radius:16px;padding:12px 14px;font-size:13px;color:#8a5a1c;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:pointer}
+.online{display:flex;align-items:center;gap:8px;font-size:13px;color:#5c8a4d}
+.online i{width:8px;height:8px;border-radius:4px;background:#7cb865;display:inline-block}
+.moodrow{display:flex;align-items:center;gap:12px}
+.moodbadge{font-size:30px}
+.moodbar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-top:10px}
+.moodbar i{display:block;height:100%}
+.trend{font-size:12px;color:#7cb865;margin-top:8px}
+.postcard-card{cursor:pointer}
+.pc-cover{height:170px;border-radius:14px;position:relative;overflow:hidden;background:linear-gradient(160deg,#ffd9a0,#f0913c 60%,#d9702b)}
+.pc-cover .sun{position:absolute;width:56px;height:56px;border-radius:50%;background:#fff5e0;top:22px;right:26px;box-shadow:0 0 24px #fff5e0}
+.pc-cover .hill{position:absolute;bottom:-30px;left:-20px;width:130%;height:90px;background:#e07b39;border-radius:50%}
+.pc-cover .hill2{position:absolute;bottom:-46px;left:10px;width:120%;height:90px;background:#c95f24;border-radius:50%}
+.pc-stamp{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.85);border-radius:8px;padding:3px 8px;font-size:10px;color:#8a5a1c;transform:rotate(-6deg)}
+.pc-quote{font-size:16px;font-weight:600;line-height:1.6;margin:12px 0 4px}
+.pc-meta{font-size:11px;color:#a09a90}
+.stream-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f0ede6}
+.stream-item:last-child{border:none}
+.s-emoji{width:40px;height:40px;border-radius:14px;background:#fdf1e3;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.s-body{flex:1}
+.s-title{font-size:14px;font-weight:600}
+.s-text{font-size:12px;color:#6b6660;line-height:1.5;margin-top:2px}
+.s-meta{font-size:11px;color:#a09a90;margin-top:4px}
+.entryrow{display:flex;gap:12px}
+.entry{flex:1;background:#fff;border-radius:16px;padding:14px;font-size:13px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.04);cursor:pointer}
+.entry span{display:block;font-size:11px;color:#a09a90;font-weight:400;margin-top:4px}
+.tabbar{position:absolute;bottom:0;left:0;right:0;height:78px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-top:1px solid #f0ede6;display:flex;z-index:8}
+.tabbar .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:#a09a90;cursor:pointer}
+.tabbar .tab.on{color:#f0913c;font-weight:600}
+.tabbar .tab .ic{font-size:20px}
+#home .tabbar{left:14px;right:14px;bottom:10px;height:62px;padding:7px;border:0;border-radius:31px;background:#191730;box-shadow:0 10px 28px rgba(32,27,66,.22)}
+#home .tabbar .tab{flex-direction:row;gap:6px;border-radius:24px;color:#9590a7;font-size:12px;font-weight:650}
+#home .tabbar .tab.on{background:#5f5b78;color:#fff}
+#home .tabbar .tab .ic{font-size:17px}
+.overlay{position:absolute;inset:0;background:rgba(16,14,18,.72);z-index:20;display:none;align-items:flex-end;justify-content:center}
+.overlay.on{display:flex}
+.coach-close{position:absolute;top:0;right:2px;z-index:26;display:flex;align-items:center;justify-content:center;width:27px;height:27px;padding:0;border:1px solid rgba(255,255,255,.4);border-radius:50%;background:rgba(28,25,39,.6);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;font-size:18px;font-weight:400;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.18);backdrop-filter:blur(8px)}
+.coach-close:active{transform:scale(.94);background:rgba(240,145,60,.9)}
+.coach{position:relative;z-index:24;background:#fff;border-radius:20px 20px 0 0;padding:22px 24px 34px;width:100%;animation:fadein .3s;font-family:"Kaiti SC","STKaiti","KaiTi",serif}
+.coach button{font-family:inherit}
+#coach .btn.org{background:#fff;color:#1f1d2b;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.coach-step{font-size:11px;color:#a09a90;margin-bottom:8px}
+.coach h3{font-size:17px;font-weight:700;margin-bottom:8px}
+.coach p{font-size:13px;line-height:1.7;color:#6b6660;margin-bottom:16px}
+.coach-ritual{text-align:center;background:linear-gradient(180deg,#fff9f3,#fff)}
+.coach-lukie{height:120px;display:flex;align-items:flex-end;justify-content:center;margin:-82px 0 12px;animation:lukie-pop .75s cubic-bezier(.2,1.35,.45,1) both}
+.coach-lukie svg{width:132px;height:116px;filter:drop-shadow(0 13px 16px rgba(177,99,38,.24))}
+.coach-lukie img{display:block;width:152px;height:152px;object-fit:contain;filter:drop-shadow(0 13px 16px rgba(20,34,64,.32))}
+.coach-lukie.has-image::after{display:none}
+.coach-lukie::after{content:"";position:absolute;width:105px;height:18px;border-radius:50%;background:rgba(111,74,48,.12);filter:blur(5px);bottom:112px;animation:lukie-shadow .75s cubic-bezier(.2,1.35,.45,1) both}
+.coach-ritual h3{font-size:21px;color:#352d2a}
+.coach-ritual p{text-align:left;padding:0 2px;color:#625954}
+.coach-center{position:absolute;left:24px;top:50%;width:322px;max-height:680px;padding:0;background:transparent;color:#fff;text-align:center;transform:translateY(-50%);animation:none;display:flex;flex-direction:column;align-items:center;gap:8px;overflow-y:auto}
+.coach-center .coach-lukie{margin:0;flex:none;height:100px}
+.coach-center .coach-lukie svg{width:110px;height:96px}
+.coach-center .coach-lukie img{width:130px;height:130px;margin-bottom:-12px}
+.coach-center .coach-step{order:-1;color:rgba(255,255,255,.68);font-size:11px;margin:0;flex:none}
+.coach-center h3{font-family:"Kaiti SC","STKaiti","KaiTi",serif;font-size:20px;font-weight:700;color:#fff;letter-spacing:.5px;text-shadow:0 2px 12px rgba(0,0,0,.42);margin:0;flex:none}
+.coach-center p{padding:0 8px;color:#fff;text-align:center;font-family:"Kaiti SC","STKaiti","KaiTi",serif;font-size:18px;font-weight:600;line-height:1.58;letter-spacing:.3px;text-shadow:0 2px 10px rgba(0,0,0,.46);margin:0;flex:none}
+.coach-center .btn{width:auto;min-width:128px;margin:8px auto 0;padding:11px 24px;flex:none}
+.coach-center .skip{position:static;display:block;margin:6px auto 0!important;color:rgba(255,255,255,.68);font-size:13px;flex:none}
+.coach-center .coach-actions{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
+.coach-center .coach-actions .btn{margin:0}
+.coach-center .coach-actions .skip{margin:0!important;padding:10px 4px}
+.coach-inline{position:absolute;left:24px;top:var(--coach-top,560px);width:322px;padding:0 38px 0 0;background:transparent;color:#fff;animation:fadein .25s}
+.coach-inline::before{content:"";position:absolute;left:18px;top:-16px;width:2px;height:10px;border-radius:2px;background:#f6a14e;box-shadow:0 0 0 3px rgba(246,161,78,.22)}
+.coach-inline.coach-above::before{top:auto;bottom:-16px}
+.coach-inline .coach-step{color:rgba(255,255,255,.58);margin-bottom:5px}
+.coach-inline p{margin:0 0 14px;color:#fff;font-family:"Kaiti SC","STKaiti","KaiTi",serif;font-size:18px;font-weight:600;line-height:1.58;letter-spacing:.3px;text-shadow:0 2px 10px rgba(0,0,0,.38)}
+.coach-inline .coach-actions{display:flex;align-items:center;gap:12px}
+.coach-inline .btn{width:auto;min-width:104px;padding:10px 20px;border-radius:13px;font-size:13px}
+.coach-inline .coach-close{top:-4px;right:0}
+.coach-inline .skip{position:static;color:rgba(255,255,255,.7);padding:8px 0}
+.tour-focus{position:relative!important;z-index:22!important;pointer-events:none;box-shadow:0 0 0 4px #fff,0 0 0 8px rgba(240,145,60,.9),0 18px 45px rgba(0,0,0,.3)!important;transform:translateZ(0)}
+.tour-focus .guide-banner-close{visibility:hidden}
+@keyframes lukie-pop{0%{opacity:0;transform:translateY(110px) scale(.68) rotate(-7deg)}65%{opacity:1;transform:translateY(-10px) scale(1.06) rotate(3deg)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+@keyframes lukie-shadow{0%{opacity:0;transform:scale(.25)}65%{opacity:.8;transform:scale(1.18)}100%{opacity:1;transform:scale(1)}}
+.fullpost{position:absolute;inset:0;background:#f5ecd9;z-index:15;display:none;flex-direction:column;padding:52px 20px 24px;overflow-y:auto}
+.fullpost.on{display:flex}
+.fp-card{background:#fffdf7;border-radius:20px;padding:18px;box-shadow:0 8px 30px rgba(120,80,20,.12);transform:rotate(-1.2deg)}
+.fp-stamp{position:absolute;top:60px;right:30px;width:64px;height:64px;border:2px dashed #c9853e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#c9853e;text-align:center;transform:rotate(12deg);opacity:0}
+.fullpost.on .fp-stamp{animation:stamp .5s .35s forwards}
+@keyframes stamp{0%{opacity:0;transform:rotate(12deg) scale(2.2)}60%{opacity:1;transform:rotate(12deg) scale(.92)}100%{opacity:1;transform:rotate(12deg) scale(1)}}
+.fp-quote{font-size:19px;font-weight:700;line-height:1.7;margin:14px 0}
+.fp-sig{text-align:right;font-size:13px;color:#a09a90}
+.fp-back{align-self:flex-start;background:none;border:none;font-size:22px;color:#8a5a1c;cursor:pointer;margin-bottom:8px}
+.fp-actions{display:flex;gap:10px;margin-top:16px}
+.fp-actions .btn{flex:1;padding:12px;font-size:14px;border-radius:14px}
+.placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#a09a90;font-size:13px;gap:8px;padding-bottom:80px}
+.annot .zcard,.annot .riskbar,.annot .greet{outline:2px dashed rgba(240,145,60,.7);outline-offset:2px}
+.annot [data-zone]::before{content:attr(data-zone);position:absolute;top:-9px;left:10px;background:#f0913c;color:#fff;font-size:9px;padding:1px 7px;border-radius:6px;z-index:7}
+.annot .greet{position:relative}
+.toast{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:#222;color:#fff;font-size:12px;padding:8px 16px;border-radius:20px;opacity:0;transition:opacity .3s;z-index:30;white-space:nowrap}
+.toast.on{opacity:1}
+.progress-note{text-align:center;font-size:12px;color:#a09a90;padding:4px 0 0}
+.first-moment{display:grid;grid-template-columns:92px 1fr;gap:13px;align-items:center}
+.first-moment-art{height:82px;border-radius:16px;background:linear-gradient(145deg,#fff0dd,#f9d2c2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.first-moment-art svg{width:76px;height:68px;filter:drop-shadow(0 6px 8px rgba(166,92,39,.14))}
+.first-moment-copy h3{margin-bottom:5px}
+.first-moment-copy p{font-size:12px;line-height:1.55}
+.first-moment-replay{margin-top:5px;border:0;background:transparent;color:#7b5cd6;font-size:12px;cursor:pointer}
+#home-first-moment{display:block;height:205px;padding:17px 16px;overflow:hidden;border:1px solid #ddd4ff;background:#faf8ff;box-shadow:0 6px 18px rgba(87,68,153,.11)}
+#home-first-moment::before{content:"";position:absolute;inset:0 0 0 37%;background:url('assets/first-meeting-home.png') center/cover no-repeat;opacity:.9}
+#home-first-moment::after{content:"";position:absolute;top:0;bottom:0;left:37%;width:62px;background:linear-gradient(90deg,#faf8ff 0%,rgba(250,248,255,.9) 34%,rgba(250,248,255,.42) 66%,rgba(250,248,255,0) 100%);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);mask-image:linear-gradient(90deg,#000 0%,#000 68%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 68%,transparent 100%);pointer-events:none}
+#home-first-moment .first-moment-art{display:none}
+#home-first-moment .first-moment-copy{position:relative;z-index:1;width:57%}
+.moment-tag{display:inline-block;margin-bottom:9px;padding:5px 9px;border-radius:8px;background:linear-gradient(135deg,#765be5,#6045cf);color:#fff;font-size:10px;font-weight:700;box-shadow:0 4px 10px rgba(100,72,205,.2)}
+#home-first-moment .first-moment-copy h3{margin-bottom:7px;font-size:18px;line-height:1.25;color:#2e2940}
+#home-first-moment .first-moment-copy p{font-size:10.5px;line-height:1.5;color:#716a78}
+#home-first-moment .first-moment-replay{margin-top:10px;padding:7px 12px;border-radius:12px;background:#7056dd;color:#fff;font-size:10px;font-weight:650}
+#first-meeting-replay{padding-top:0;background:#061747}
+.meeting-replay-image{display:block;width:100%;height:100%;object-fit:contain}
+.meeting-replay-back{position:absolute;top:56px;left:16px;z-index:7;display:flex;align-items:center;gap:5px;padding:9px 13px;border:1px solid rgba(255,255,255,.36);border-radius:18px;background:rgba(4,16,54,.62);backdrop-filter:blur(10px);color:#fff;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 5px 18px rgba(0,0,0,.2)}
+.postcard-status{position:relative;min-height:154px;padding:22px 105px 20px 22px!important;overflow:hidden;border:7px solid transparent!important;border-radius:17px!important;background:linear-gradient(145deg,#fffdf8,#fff7e9) padding-box,repeating-linear-gradient(135deg,#e98272 0 9px,#fff 9px 18px,#7893c9 18px 27px,#fff 27px 36px) border-box!important;box-shadow:0 9px 22px rgba(137,92,48,.12),inset 0 0 0 1px rgba(189,145,92,.16)!important;transform:rotate(-.35deg)}
+#home-postcards.postcard-status{width:100%;margin:0!important;box-sizing:border-box;border-radius:0!important;transform:none;cursor:default}
+#home-postcards.postcard-status>p{position:absolute;right:4px;bottom:17px;width:120px;padding:0 0 4px;border:0;background:linear-gradient(90deg,transparent 4%,rgba(190,126,68,.48) 22%,rgba(190,126,68,.48) 78%,transparent 96%) left bottom/100% 1px no-repeat;text-align:center;white-space:nowrap;font-family:"Kaiti SC","STKaiti","KaiTi",serif;font-size:9.5px;font-weight:700;line-height:1;color:#9d653f;letter-spacing:.1px;transform:rotate(-2deg);text-shadow:0 1px 0 rgba(255,255,255,.8)}
+#home-postcards.postcard-status>p::before{content:"✦";display:inline-block;margin-right:4px;color:#d79a52;font-size:8px;transform:translateY(-1px)}
+#home-postcards.postcard-status>p::after{content:"♡";display:inline-block;margin-left:3px;color:#c17a48;font-size:9px;transform:rotate(8deg)}
+.postcard-waiting-title{display:flex;align-items:center;gap:7px}
+.postcard-envelope{position:relative;display:inline-block;flex:none;width:22px;height:16px;border:1.8px solid #a66e42;border-radius:3px;background:#fff8ed;box-shadow:0 2px 5px rgba(133,82,43,.13)}
+.postcard-envelope::before,.postcard-envelope::after{content:"";position:absolute;top:2px;width:12px;height:1.8px;background:#a66e42}
+.postcard-envelope::before{left:1px;transform:rotate(34deg);transform-origin:left center}
+.postcard-envelope::after{right:1px;transform:rotate(-34deg);transform-origin:right center}
+.postcard-status::after{content:"";position:absolute;right:17px;top:20px;width:54px;height:64px;border:1.5px dashed #d49a65;border-radius:4px;background:linear-gradient(145deg,#f8d8b4,#e9a966);box-shadow:0 3px 8px rgba(142,88,39,.14)}
+.postcard-status::before{content:"LUKIE\A 邮局";white-space:pre;position:absolute;right:26px;top:34px;z-index:1;width:38px;text-align:center;color:#86572f;font-size:9px;font-weight:750;line-height:1.35;transform:rotate(-4deg)}
+.postcard-status h3{font-family:"Kaiti SC","STKaiti","KaiTi",serif;font-size:16px}
+.postcard-status>p{padding-bottom:11px;border-bottom:1px solid rgba(173,132,88,.28);background:repeating-linear-gradient(180deg,transparent 0 22px,rgba(173,132,88,.16) 22px 23px);line-height:1.7}
+.v2card.posthero.postcard-status .stampmark{top:91px;right:13px;left:auto;border:2px solid rgba(166,101,58,.55);border-radius:50%;padding:8px 5px;background:transparent;color:#9d653f;transform:rotate(10deg);font-size:8px;letter-spacing:.4px}
+.postcard-state{display:inline-flex;align-items:center;gap:5px;margin-top:11px;padding:5px 9px;border-radius:10px;background:#f6e7d5;color:#a66e32;font-size:11px;font-weight:650}
+.postcard-state i{width:6px;height:6px;border-radius:50%;background:#e49a4b;box-shadow:0 0 0 3px rgba(228,154,75,.16)}
+.first-attention{position:relative;margin:0 14px 12px;padding:15px 15px 15px 57px;border:1.5px solid #ffb9b9;border-radius:19px;background:linear-gradient(135deg,#ffe4e4,#ffd9d9);box-shadow:0 4px 13px rgba(214,61,61,.1)}
+.first-attention-icon{position:absolute;left:14px;top:14px;display:flex;align-items:center;justify-content:center;width:33px;height:33px;border:3px solid #ff3535;border-radius:11px;background:#15151b;color:#4cff65;font-size:15px;box-shadow:0 0 0 3px rgba(255,53,53,.12)}
+.first-attention b{display:block;margin-bottom:4px;font-size:13px;color:#e52f35}
+.first-attention p{font-size:11.5px;line-height:1.55;color:#c84a4e}
+.first-overview{margin:0 0 13px;overflow:hidden}
+.first-overview-title{margin:0 16px 8px;font-size:13px;font-weight:700;color:#403a47}
+.first-overview-grid{display:grid;grid-template-columns:repeat(4,108px);gap:9px;padding:0 14px 3px;overflow-x:auto;scrollbar-width:none}
+.first-overview-grid::-webkit-scrollbar{display:none}
+.first-stat{min-height:82px;padding:10px 12px;border:1px solid rgba(124,102,189,.1);border-radius:16px;background:linear-gradient(155deg,#fff,#faf8ff);box-shadow:0 3px 10px rgba(74,59,116,.055)}
+.first-stat-label{display:flex;align-items:center;gap:5px;margin-bottom:8px;font-size:10px;color:#7b7184;white-space:nowrap}
+.first-stat-label i{font-style:normal;font-size:14px}
+.first-stat strong{display:block;font-size:24px;line-height:1;color:#242038}
+.first-stat small{display:block;margin-top:6px;font-size:10px;line-height:1.35;color:#a29aa9}
+.first-stat.wait strong{font-size:15px;line-height:1.25}
+/* 响应式布局已禁用 - 始终保持左侧面板+中间手机框的预览模式 */
+/* @media (max-width:760px){body{flex-direction:column;align-items:center}.panel{position:static;width:390px}} */
+
+/* ===== 首页 v2 · 星空渐变系（融合卓贤稿 图04+图08+图06） ===== */
+.sky{border-radius:0 0 28px 28px;padding:14px 20px 22px;color:#fff;position:relative;overflow:hidden;margin:0 0 12px;background:linear-gradient(160deg,#8f7ff0 0%,#b8a9e8 45%,#f0b8c8 100%)}
+.sky.dusk{background:linear-gradient(165deg,#4a5590 0%,#7b6fb8 55%,#b08ec0 100%)}
+.sky.gloom{background:linear-gradient(165deg,#3d4460 0%,#5a5f7e 60%,#7a7f96 100%)}
+.sky .stars{position:absolute;inset:0;pointer-events:none;opacity:.7;background-image:radial-gradient(1.5px 1.5px at 18% 22%,#fff,transparent),radial-gradient(1px 1px at 66% 12%,#fff,transparent),radial-gradient(1.5px 1.5px at 84% 34%,#fff,transparent),radial-gradient(1px 1px at 40% 46%,#fff,transparent),radial-gradient(1.2px 1.2px at 55% 8%,#fff,transparent),radial-gradient(1px 1px at 8% 58%,#fff,transparent)}
+.sky .date{font-size:11px;opacity:.85}
+.sky h1{font-size:23px;font-weight:700;margin:3px 0 10px;position:relative}
+.sky .blobrow{display:flex;align-items:center;gap:10px;position:relative}
+.skyblob{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 32% 30%,#bfe0ff,#6f9fe8 70%,#5b8bd8);box-shadow:0 4px 14px rgba(40,60,140,.4);position:relative;flex:none}
+.skyblob::before{content:"";position:absolute;top:16px;left:13px;width:5px;height:7px;border-radius:3px;background:#2b3266;box-shadow:14px 0 0 #2b3266}
+.skyblob::after{content:"";position:absolute;top:28px;left:19px;width:8px;height:4px;border-radius:0 0 6px 6px;background:#2b3266}
+.skyblob.sleepy::after{width:8px;height:2px;top:30px;border-radius:2px}
+.sky .stxt{font-size:12.5px;line-height:1.5;opacity:.95}
+.v2card{background:#fff;border-radius:20px;padding:16px;margin:0 14px 12px;box-shadow:0 2px 10px rgba(80,70,140,.06);position:relative}
+.v2card h3{font-size:15px;font-weight:700;margin-bottom:6px;color:#2b2b3a}
+.v2card p{font-size:13px;line-height:1.65;color:#6b6660}
+.posthero{background:linear-gradient(135deg,#fffaf0,#fdf1e3);border:1px solid #f3e0c0;cursor:pointer}
+.posthero .stampmark{position:absolute;top:12px;right:14px;font-size:10px;color:#b3814a;border:1.5px solid #d9b98a;border-radius:6px;padding:2px 6px;transform:rotate(8deg)}
+.posthero .quote{font-size:16px;font-weight:700;color:#4a3a22;line-height:1.6;margin:8px 0}
+.hlcard{padding:0;overflow:hidden;cursor:pointer}
+.hlcard .hlimg{height:150px;background:linear-gradient(140deg,#ffd98a,#f5a05c 55%,#7b8cde);position:relative;display:flex;align-items:flex-end;padding:12px 16px}
+.hlcard .hlimg .hltag{position:absolute;top:12px;left:14px;background:#f0913c;color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:8px}
+.hlcard .hlimg .hltitle{color:#fff;font-size:17px;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.hlcard .hlbody{padding:12px 16px;display:flex;align-items:center;gap:10px}
+.hlcard .hlbody p{flex:1}
+.wavepill{display:flex;align-items:center;gap:8px;background:#f2edff;border-radius:20px;padding:7px 12px;flex:none}
+.wavepill .play{width:26px;height:26px;border-radius:50%;background:#7b5cd6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;flex:none}
+.wavepill .bars{display:flex;align-items:center;gap:2px;height:18px}
+.wavepill .bars i{width:2.5px;background:#7b5cd6;border-radius:2px;display:block}
+.wavepill .dur{font-size:10px;color:#7b5cd6;font-weight:600}
+.tl{margin:4px 0 0 4px;border-left:2px solid #e8e2f5;padding-left:16px}
+.tl .titem{position:relative;padding:0 0 14px}
+.tl .titem::before{content:"";position:absolute;left:-22px;top:5px;width:9px;height:9px;border-radius:50%;background:#b8a9e8;border:2px solid #fff;box-shadow:0 0 0 2px #e8e2f5}
+.tl .ttime{font-size:11px;color:#a09a90;font-weight:600}
+.tl .ttext{font-size:13px;color:#4a4650;line-height:1.55;margin-top:1px}
+.tl .tchip{display:inline-block;font-size:10px;padding:1px 8px;border-radius:8px;margin-left:6px;font-weight:600}
+.wchip{display:inline-flex;align-items:center;gap:4px;background:#f4f0ff;color:#6a55b8;border-radius:10px;padding:4px 10px;font-size:12px;font-weight:600;margin:2px 6px 2px 0}
+.leftoff{background:#f6f3ff;border-radius:14px;padding:12px 14px;font-size:13px;color:#4a4460;line-height:1.6;border-left:3px solid #7b5cd6;margin-top:8px}
+.annot .v2card,.annot .sky{outline:2px dashed rgba(240,145,60,.7);outline-offset:2px}
+.annot .sky{position:relative}
+.ref-home{min-height:100%;padding:14px 14px 28px;background:linear-gradient(155deg,#e8e9ff 0%,#f8e8f1 28%,#eeebff 58%,#f3efff 100%);color:#19182f}
+.ref-hero{position:relative;min-height:208px;padding:8px 8px 12px}
+.ref-online{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:15px;background:#e7f9e8;color:#20b84b;font-size:11px;font-weight:700}
+.ref-online::before{content:"";width:8px;height:8px;border-radius:50%;background:#2dc653}
+.ref-greet{max-width:220px;margin-top:13px;font-size:12px;font-weight:650;line-height:1.5;color:#77738d}
+.ref-hero h1{max-width:220px;margin-top:8px;font-size:27px;line-height:1.2;letter-spacing:-.6px;color:#1d1b3a}
+.ref-mood-state{display:inline-flex;align-items:center;margin-top:7px;padding:7px 12px;border-radius:15px;background:linear-gradient(135deg,#ff9b55,#ff6e68);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;font-weight:650;line-height:1.25;letter-spacing:0;box-shadow:0 7px 16px rgba(255,111,91,.24)}
+.ref-lukie{position:absolute;right:6px;top:33px;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 32% 25%,#e8fbff 0%,#94e4ff 42%,#54b9e7 74%,#3a8dc5 100%);border:1px solid rgba(255,255,255,.78);box-shadow:inset -10px -14px 22px rgba(35,126,186,.2),0 14px 28px rgba(90,119,185,.18)}
+.ref-lukie::before{content:"";position:absolute;left:33px;top:43px;width:7px;height:17px;border-radius:5px;background:#151725;box-shadow:38px 0 0 #151725}
+.ref-lukie::after{content:"";position:absolute;left:45px;top:67px;width:25px;height:10px;border-bottom:5px solid #151725;border-radius:0 0 20px 20px;transform:rotate(-5deg)}
+.ref-prompt{position:absolute;left:8px;bottom:11px;display:flex;align-items:center;gap:7px;width:255px;padding:8px 11px;border-radius:18px;background:rgba(235,230,255,.9);color:#7059e8;font-size:11px;white-space:nowrap;overflow:hidden}
+.ref-prompt time{flex:none;padding-right:7px;border-right:1px solid rgba(112,89,232,.2);font-size:10px;font-weight:700;color:#8c7de1}
+.ref-prompt-viewport{min-width:0;flex:1;overflow:hidden}
+.ref-prompt-text{display:inline-block;min-width:max-content;will-change:transform}
+.ref-prompt-text.is-marquee{animation:prompt-marquee 9s ease-in-out infinite}
+.ref-prompt-arrow{flex:none;font-weight:800}
+@keyframes prompt-marquee{0%,15%{transform:translateX(0)}75%,90%{transform:translateX(var(--prompt-shift))}100%{transform:translateX(0)}}
+.ref-card{margin-bottom:15px;border-radius:22px;background:#fff;box-shadow:0 5px 18px rgba(74,63,139,.045)}
+.ref-insight-group{border-radius:24px}
+.ref-danger{margin-bottom:15px;padding:14px 14px 13px;border:1px solid #ffb8b8;border-radius:19px;background:#ffe1e1;color:#ff3037}
+.ref-danger-head{display:flex;align-items:center;gap:7px;margin-bottom:8px;font-size:15px;font-weight:800}
+.ref-danger-bot{position:relative;width:42px;height:26px;border:4px solid #ff3037;border-radius:15px;background:#fff;flex:none}
+.ref-danger-bot::before{content:"";position:absolute;inset:4px;border-radius:8px;background:#101015}
+.ref-danger-bot::after{content:"";position:absolute;left:12px;top:8px;width:5px;height:7px;border-radius:3px;background:#45f25d;box-shadow:11px 0 0 #45f25d}
+.ref-danger-alert{align-self:flex-start;margin-top:-3px;font-size:17px;font-weight:900;transform:rotate(12deg)}
+.ref-danger p{font-size:11.5px;line-height:1.5;color:#ef242b}
+.ref-metrics{display:grid;grid-template-columns:1fr 1fr 1.18fr;padding:17px 10px}
+.ref-metric{min-width:0;padding:0 10px;border-right:1px solid #eeeafb}
+.ref-metric:last-child{border-right:0}
+.ref-label{font-size:10.5px;color:#858096;white-space:nowrap}
+.ref-value{margin-top:7px;font-size:27px;font-weight:800;line-height:1;color:#070711}
+.ref-value small{font-size:10px;font-weight:500;color:#aaa4c0}
+.ref-tags{display:flex;gap:7px;margin-top:9px}
+.ref-tags{position:relative}
+.ref-tags i,.ref-topic{display:flex;align-items:center;justify-content:center;width:29px;height:29px;padding:0;border:0;border-radius:50%;background:#f0ebff;font-style:normal;font-size:14px;cursor:pointer;transition:transform .15s,background .15s}
+.ref-topic.on{background:#ded4ff;transform:translateY(-2px)}
+.ref-topic-bubble{position:absolute;left:0;bottom:39px;z-index:5;display:none;min-width:76px;padding:7px 10px;border-radius:11px;background:#28233f;color:#fff;font-size:10px;font-weight:650;text-align:center;white-space:nowrap;box-shadow:0 7px 18px rgba(36,29,68,.25);transform:translateX(-50%)}
+.ref-topic-bubble.on{display:block;animation:fadein .18s ease}
+.ref-topic-bubble::after{content:"";position:absolute;left:50%;bottom:-5px;width:10px;height:10px;background:#28233f;transform:translateX(-50%) rotate(45deg)}
+.ref-summary{position:relative;min-height:128px;padding:17px 104px 17px 17px}
+.ref-summary-time{font-size:11px;color:#918ba4}
+.ref-summary h3{margin:9px 0 5px;font-size:15px;color:#15141d}
+.ref-summary p{font-size:11.5px;line-height:1.55;color:#777187}
+.ref-summary-art{position:absolute;right:18px;top:28px;width:65px;height:72px;border-radius:10px;background:linear-gradient(145deg,#fffdf4,#f3eedc);box-shadow:7px 7px 0 #9c82ef;transform:rotate(7deg)}
+.ref-summary-art::after{content:"✨";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:25px}
+.ref-section-head{display:flex;align-items:center;justify-content:space-between;margin:23px 0 11px;padding:0 1px}
+.ref-section-head h2{font-size:18px;color:#11101c}
+.ref-section-head span{font-size:11px;color:#7b758a}
+.ref-more{border:0;background:transparent;color:#7b758a;font-size:11px;cursor:pointer;padding:5px 0}
+.ref-highlight{position:relative;min-height:230px;padding:0;overflow:hidden;border:6px solid transparent;border-radius:22px;background:linear-gradient(145deg,rgba(37,45,83,.14),rgba(30,24,48,.84)),url('assets/first-meeting-home.png') center/cover padding-box,repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px) border-box;color:#fff}
+.ref-highlight.is-meeting-clear{background:url('assets/first-meeting-home.png') center/cover no-repeat padding-box,repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px) border-box}
+.ref-highlight.is-meeting-clear .ref-highlight-copy{background:transparent;text-shadow:0 2px 8px rgba(0,0,0,.72)}
+.ref-highlight.is-painter{min-height:250px;border:6px solid transparent;border-radius:0;background-color:#f5eadc;background-image:url('assets/growth-postcard-future-painter.png?v=2'),repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px)!important;background-position:center,center!important;background-size:cover,auto!important;background-repeat:no-repeat,repeat!important;background-origin:padding-box,border-box!important;background-clip:padding-box,border-box!important}
+.ref-highlight.is-painter::before,.ref-highlight.is-painter::after{content:none!important;display:none!important;background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.ref-highlight-copy{position:absolute;inset:auto 18px 18px;padding-top:46px;background:linear-gradient(180deg,transparent,rgba(20,17,35,.64))}
+.ref-highlight.is-painter .ref-highlight-copy{left:18px;right:18px;bottom:18px;width:auto;padding:0;border-radius:0;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;text-shadow:0 2px 8px rgba(0,0,0,.72)}
+.ref-highlight.is-painter.is-clickable{cursor:pointer}
+.ref-highlight.is-journey{background:url('assets/story-journey-watercolor-v2.png') center/cover no-repeat padding-box,repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px) border-box}
+.ref-highlight.is-journey::before,.ref-highlight.is-journey::after{content:none!important;display:none!important}
+.ref-highlight h3{max-width:250px;font-size:20px;line-height:1.32;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.ref-highlight p{max-width:260px;margin-top:8px;font-size:11.5px;line-height:1.58;color:rgba(255,255,255,.88)}
+.ref-audio{display:flex;align-items:center;gap:8px;margin-top:12px;padding:7px 10px;border-radius:22px;background:rgba(24,20,37,.62);backdrop-filter:blur(7px)}
+.ref-audio-play{display:flex;align-items:center;justify-content:center;width:31px;height:31px;padding:0;border:0;border-radius:50%;background:#fff;color:#28233c;font-size:12px;cursor:pointer}
+.ref-wave{flex:1;overflow:hidden;color:#fff;letter-spacing:2px;white-space:nowrap;opacity:.9}
+.ref-audio time{font-size:10px;color:#c8c3d1}
+.ref-audio.playing{background:rgba(90,65,173,.78);box-shadow:0 0 0 2px rgba(255,255,255,.16)}
+.ref-audio.playing .ref-audio-play{background:#ff9854;color:#fff}
+.ref-audio.playing .ref-wave{animation:audioPulse .7s ease-in-out infinite alternate}
+@keyframes audioPulse{from{opacity:.45;transform:scaleY(.72)}to{opacity:1;transform:scaleY(1.08)}}
+.ref-stream{display:grid;gap:12px;border-radius:22px}
+.ref-stream-divider{display:flex;align-items:center;gap:9px;margin:7px 2px 3px;color:#8b85a0;font-size:10.5px;font-weight:650;text-align:center}
+.ref-stream-divider::before,.ref-stream-divider::after{content:"";height:1px;flex:1;background:#d9d4e9}
+.ref-stream-divider.is-static::before,.ref-stream-divider.is-static::after{height:0;background:none;border-top:1px dashed #cfc9df}
+.ref-stream-date{margin:5px 1px 1px;font-size:15px;color:#77718b}
+.ref-stream-past{display:none;gap:12px}
+.ref-stream-past.on{display:grid;animation:past-stream-in .45s ease both}
+.ref-stream-past.on.is-static{animation:none}
+.ref-stream-past.on+.ref-stream-divider{display:none}
+@keyframes past-stream-in{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.ref-stream-item{display:grid;grid-template-columns:45px 1fr 34px;gap:12px;align-items:center;padding:14px;border-radius:20px;background:#fff}
+.ref-stream-icon{display:flex;align-items:center;justify-content:center;width:45px;height:45px;border-radius:13px;background:#fff0c7;font-size:21px}
+.ref-stream-copy{min-width:0}.ref-stream-copy h3{font-size:14px;margin-bottom:3px}.ref-stream-copy p{font-size:11px;color:#7d788b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ref-stream-history .ref-stream-copy p{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:4;white-space:normal;text-overflow:clip;line-height:1.62}
+.risk-stream .ref-stream-item{align-items:start}.risk-stream .ref-stream-copy h3{line-height:1.45}.risk-stream .ref-stream-copy p{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.62}
+.ref-stream-tags{margin-top:6px}.ref-stream-tags span{display:inline-block;margin-right:5px;padding:3px 8px;border-radius:10px;background:#eee9ff;color:#735ce6;font-size:9.5px}
+.ref-stream-time{align-self:start;text-align:right;font-size:10px;color:#aaa4c0}.ref-stream-play{display:flex;align-items:center;justify-content:center;width:31px;height:31px;margin-top:8px;border-radius:50%;background:#eee8ff;color:#171523;font-size:10px}
+.gallery-page{flex:1;overflow-y:auto;padding:14px 14px 34px;background:#f4f1ff}
+.gallery-head{display:flex;align-items:center;gap:12px;padding:5px 2px 18px}
+.gallery-back{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:50%;background:#fff;color:#605a77;font-size:22px;cursor:pointer;box-shadow:0 3px 10px rgba(74,63,139,.08)}
+.gallery-head h1{font-size:22px;color:#17152a}.gallery-sub{margin:-9px 2px 14px;font-size:11px;color:#8f899f}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.gallery-item{position:relative;aspect-ratio:1;border:0;padding:0;overflow:hidden;background:#ddd;cursor:pointer}
+.gallery-item:first-child{border-radius:14px 0 0 0}.gallery-item:nth-child(3){border-radius:0 14px 0 0}
+.gallery-item img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .2s}.gallery-item:active img{transform:scale(.97)}
+.gallery-meta{position:absolute;left:0;right:0;bottom:0;padding:18px 6px 5px;background:linear-gradient(transparent,rgba(16,13,28,.72));color:#fff;font-size:8.5px;line-height:1.25;text-align:left;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.postcard-detail-page{height:100%;display:flex;flex-direction:column;padding:19px 16px 30px;background:#15141e;color:#fff}
+.postcard-detail-back{align-self:flex-start}
+.postcard-detail-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px 0}
+.postcard-detail-stage img{display:block;max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 18px 52px rgba(0,0,0,.42)}
+.postcard-detail-meta{padding-top:13px;color:#fff;font-size:13px;text-align:center;letter-spacing:.2px}
+.mine-page{height:100%;overflow-y:auto;padding:20px 16px 24px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
+.mine-page h1{margin-bottom:3px;font-size:25px;color:#19172a}.mine-page-subtitle{display:block;margin-bottom:17px;color:#77718c;font-size:12px}
+.mine-device-card{display:flex;align-items:center;gap:13px;width:100%;margin-bottom:14px;padding:13px 14px;border:0;border-radius:20px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.08);text-align:left;cursor:pointer}
+.mine-device-art{display:flex;align-items:center;justify-content:center;width:76px;height:66px;flex:none;overflow:hidden}.mine-device-art img{display:block;width:100%;height:100%;object-fit:contain}
+.mine-device-copy{flex:1;min-width:0}.mine-device-copy b{display:block;font-size:19px;color:#201d32}.mine-device-status{display:flex;align-items:center;gap:7px;margin-top:7px;color:#aaa3b8;font-size:11px}.mine-device-connection{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:#f0eef5;color:#9690a5;font-style:normal}.mine-device-connection i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b9b3c8}.mine-device-connection.is-online{background:#edf7ec;color:#6f9a69}.mine-device-connection.is-online i{background:#7cb865}.mine-device-battery{padding:4px 8px;border-radius:11px;background:#eee9ff;color:#735ce6;font-style:normal;font-weight:650}
+.mine-section{margin-bottom:11px;border-radius:18px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.06);overflow:hidden}.mine-row{display:flex;width:100%;box-sizing:border-box;align-items:center;gap:12px;min-height:52px;padding:0 15px;border:0;border-bottom:1px solid #f0edf6;background:#fff;color:#262235;text-align:left;font-size:14px;cursor:pointer}.mine-row:last-child{border-bottom:0}.mine-row:active{background:#faf8ff}.mine-row-icon{display:flex;align-items:center;justify-content:center;width:22px;height:22px;flex:none;color:#7d7690}.mine-row-icon svg{display:block;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.mine-row-label{flex:1}.mine-row-value{color:#9a94a8;font-size:12px}.mine-row-arrow{color:#aaa3b8;font-size:22px;line-height:1}
+.mine-section-danger{background:transparent;box-shadow:none;overflow:visible}.mine-section-danger .mine-row{color:#df4c59;border-radius:16px;border-bottom:0;justify-content:flex-start;margin-bottom:0;box-shadow:0 3px 13px rgba(72,61,126,.06)}.mine-section-danger .mine-row .mine-row-icon{color:#df4c59}.mine-section-danger .mine-row .mine-row-arrow{display:inline;color:#df4c59}.mine-section-danger .mine-row:last-child{margin-bottom:0}
+.mine-logout{display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;min-height:56px;margin:38px 0 0;border:1px solid #ffb8b8;border-radius:18px;background:#ffe0e0;color:#df4c59;font-size:16px;font-weight:650;cursor:pointer}.mine-logout:active{background:#ffd3d3}
+.mine-entry{display:flex;align-items:center;gap:12px;width:100%;padding:15px;border:0;border-radius:18px;background:#fff;text-align:left;box-shadow:0 3px 13px rgba(72,61,126,.08);cursor:pointer}
+.mine-entry-icon{display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:14px;background:#eee9ff;font-size:21px}
+.mine-entry-copy{flex:1}.mine-entry-copy b{display:block;font-size:15px;color:#272438}.mine-entry-copy span{display:block;margin-top:3px;font-size:11px;color:#9892a6}
+.mine-entry-arrow{color:#aaa3b8;font-size:23px}
+.guide-banner{position:relative;display:flex;align-items:center;gap:10px;margin:0 0 13px;padding:10px 34px 10px 12px;border:1px solid #ded6ff;border-radius:15px;background:rgba(255,255,255,.78);box-shadow:0 4px 13px rgba(72,61,126,.06)}
+.guide-banner-copy{min-width:0;flex:1;font-size:10.5px;line-height:1.48;color:#68627b}
+.guide-banner-copy strong{display:block;margin-bottom:2px;color:#302b4d;font-size:11.5px}
+.guide-banner-copy span{display:block}
+.guide-banner-action{flex:none;padding:8px 11px;border:0;border-radius:10px;background:#6752d1;color:#fff;font-size:10.5px;font-weight:700;white-space:nowrap;cursor:pointer;box-shadow:0 4px 10px rgba(103,82,209,.24);transition:background .15s,transform .15s,box-shadow .15s}
+.guide-banner-action:active{background:#5743bd;box-shadow:0 2px 6px rgba(103,82,209,.22);transform:scale(.96)}
+.guide-banner-close{position:absolute;top:7px;right:8px;width:19px;height:19px;border:0;border-radius:50%;background:transparent;color:#9b95ad;font-size:17px;line-height:17px;cursor:pointer}
+.guide-detail-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
+.guide-detail-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}.guide-detail-head h1{font-size:21px;color:#211d34}
+.guide-detail-subtitle{display:block;margin:-7px 3px 16px;color:#77718c;font-size:12px;line-height:1.5}
+.guide-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.guide-item{display:flex;min-height:142px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px 10px;border:1px solid rgba(222,214,255,.9);border-radius:16px;background:rgba(255,255,255,.84);box-shadow:0 3px 12px rgba(72,61,126,.05);text-align:center;font-family:inherit;cursor:pointer}
+.guide-item-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:13px;background:#eee9ff;font-size:22px}
+.guide-item b{font-size:13px;font-weight:650;line-height:1.35;color:#2d2940;overflow-wrap:anywhere}
+.guide-item-desc{display:block;min-height:30px;color:#817b8e;font-size:10.5px;line-height:1.45}
+.guide-item-tags{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;min-height:18px}
+.guide-item-tags i{padding:3px 6px;border-radius:8px;background:#f3efff;color:#735ce6;font-size:9px;font-style:normal;line-height:1}
+.guide-help-link{margin:0}
+.guide-help-card-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:13px;background:#eee9ff;color:#735ce6;font-size:22px;font-weight:700}.guide-help-card-copy{display:block;flex:0;min-width:0}.guide-help-card-copy b{font-size:13px;font-weight:650;line-height:1.45;color:#2d2940}.guide-help-card-copy small,.guide-help-card-arrow{display:none}
+.guide-wifi-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
+.guide-wifi-page .gallery-back{margin-bottom:8px}
+.guide-wifi-page .bind-steps{margin-top:4px}
+.guide-dialogue-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
+.guide-dialogue-page .gallery-back{margin-bottom:8px}.guide-dialogue-head{margin:4px 0 18px;color:#211d34;font-size:21px}.guide-dialogue-intro{margin-bottom:14px;color:#77718c;font-size:12px;line-height:1.55}.guide-dialogue-steps{display:flex;flex-direction:column;gap:10px}.guide-dialogue-step{display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:18px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05)}.guide-dialogue-step-content{flex:1;min-width:0}.guide-dialogue-num{display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:none;border-radius:50%;background:#eee9ff;color:#735ce6;font-size:14px;font-weight:700}.guide-dialogue-step b{display:block;margin:2px 0 5px;color:#2d2940;font-size:14px}.guide-dialogue-step p{color:#817b8e;font-size:12px;line-height:1.6}.guide-dialogue-gif-placeholder{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;margin-top:12px;border:1.5px dashed #c9c0e9;border-radius:16px;background:rgba(255,255,255,.58);color:#aaa1c6;font-size:11px;font-weight:650;letter-spacing:.3px}
+.guide-topic-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
+.guide-topic-head{display:flex;align-items:center;gap:10px;margin-bottom:5px}.guide-topic-head h1{font-size:21px;color:#211d34}
+.guide-topic-intro{margin:0 3px 14px;color:#77718c;font-size:12px;line-height:1.55}
+.guide-topic-block{margin-bottom:11px;padding:14px 14px 13px;border-radius:18px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05)}
+.guide-topic-block h2{margin:0 0 9px;color:#2d2940;font-size:14px;line-height:1.4}
+.guide-topic-block p{margin:0;color:#817b8e;font-size:11.5px;line-height:1.65}
+.guide-topic-steps{display:flex;flex-direction:column;gap:9px}
+.guide-topic-step{display:grid;grid-template-columns:25px minmax(0,1fr);gap:9px;align-items:start}
+.guide-topic-num{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50%;background:#eee9ff;color:#735ce6;font-size:12px;font-weight:700}
+.guide-topic-step-copy b{display:block;margin:1px 0 3px;color:#2d2940;font-size:12.5px;line-height:1.4}
+.guide-topic-step-copy p{color:#817b8e;font-size:11.5px;line-height:1.6}
+.guide-topic-gif{display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;margin-top:8px;border:1.5px dashed #c9c0e9;border-radius:12px;background:#faf8ff;color:#aaa1c6;font-size:10px;font-weight:650;letter-spacing:.2px}
+.guide-topic-note{margin-top:9px;padding:9px 10px;border-radius:10px;background:#fff8eb;color:#a66e32;font-size:10.5px;line-height:1.55}
+.help-center-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:#f1efff}
+.help-center-head{position:relative;display:flex;align-items:center;justify-content:center;height:42px;margin-bottom:15px}.help-center-head h1{font-size:21px;color:#211d34}.help-center-head .gallery-back{position:absolute;left:0}
+.account-management-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:#f1efff}.account-management-head{position:relative;display:flex;align-items:center;justify-content:center;height:42px;margin-bottom:15px}.account-management-head h1{font-size:21px;color:#211d34}.account-management-head .gallery-back{position:absolute;left:0}.account-card{margin-bottom:13px;padding:17px 16px;border-radius:20px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05)}.account-card-title{display:block;margin-bottom:24px;color:#aaa5ba;font-size:15px;font-weight:650}.account-empty{padding:14px 0 4px;color:#aaa5ba;font-size:16px;text-align:center}.account-provider-card{padding:17px 0 0}.account-provider-card .account-card-title{padding:0 16px}.account-provider{display:flex;align-items:center;gap:14px;width:100%;min-height:72px;padding:0 16px;box-sizing:border-box;border:0;border-bottom:1px solid #f0edf6;background:transparent;color:#171522;font-family:inherit;font-size:15px;text-align:left;cursor:pointer}.account-provider:last-child{border-bottom:0}.account-provider-brand{display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:none;font-size:25px;font-weight:700;line-height:1}.account-provider-brand.apple{color:#111}.account-provider-brand.google{background:conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 45%,#fbbc05 0 68%,#ea4335 0 85%,#4285f4 0);-webkit-background-clip:text;background-clip:text;color:transparent;font-family:Arial,sans-serif;font-size:26px}.account-provider-label{flex:1}.account-bind{padding:9px 14px;border:0;border-radius:999px;background:#eee9ff;color:#735ce6;font-family:inherit;font-size:13px;font-weight:650;cursor:pointer}.account-danger{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;margin:0 0 13px;padding:0 16px;border:0;border-radius:18px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05);color:#df4c59;font-family:inherit;font-size:14px;text-align:left;cursor:pointer}.account-danger .mine-row-label{flex:1}.account-danger .mine-row-arrow{color:#df4c59}
+.help-group{margin-bottom:12px;padding:16px;border-radius:20px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05)}
+.help-group-title{margin:0 0 10px;color:#aaa5ba;font-size:15px;font-weight:650}
+.help-question{border-bottom:1px solid #f0edf6}.help-question:last-child{border-bottom:0}.help-question summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:53px;color:#171522;font-size:14px;font-weight:550;line-height:1.45;cursor:pointer;list-style:none}.help-question summary::-webkit-details-marker{display:none}.help-question summary::after{content:'⌄';flex:none;color:#aaa4bb;font-size:21px;line-height:1;transform:translateY(-2px)}.help-question[open] summary::after{content:'⌃';transform:translateY(2px)}
+.help-answer{padding:0 0 14px;color:#817b8e;font-size:11.5px;line-height:1.65}.help-answer p{margin:0}.help-answer-media{display:block;width:100%;max-height:150px;margin-top:10px;border-radius:13px;object-fit:cover;object-position:center;box-shadow:0 3px 12px rgba(72,61,126,.08)}
+.profile-detail-page{position:relative;height:100%;overflow-y:auto;padding:15px 16px 28px;background:#f4f1ff}
+.profile-detail-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.profile-detail-head h1{font-size:20px;color:#17152a}
+.saved-profile-hero{display:flex;align-items:center;gap:13px;padding:17px;margin-bottom:12px;border-radius:20px;background:linear-gradient(135deg,#fff,#f3edff)}
+.saved-profile-avatar{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;background:#e8ddff;font-size:28px}.saved-profile-hero h2{font-size:18px}.saved-profile-hero p{margin-top:3px;font-size:11px;color:#8a8498}
+.saved-profile-card{padding:4px 16px;border-radius:20px;background:#fff}
+.saved-profile-row{display:flex;justify-content:space-between;gap:18px;padding:15px 0;border-bottom:1px solid #eeeaf5;font-size:13px}.saved-profile-row:last-child{border-bottom:0}.saved-profile-row span{color:#8c8699}.saved-profile-row b{max-width:210px;color:#282536;text-align:right;line-height:1.5}
+.profile-detail-form{padding-top:10px;padding-bottom:64px}.profile-detail-form .profile-card{margin:0 0 9px;padding:12px;border-radius:17px}.profile-detail-form .profile-section-head{margin-bottom:9px}.profile-detail-form .profile-section-head h3{font-size:14px}.profile-detail-form .profile-basics .field{grid-template-columns:64px minmax(0,1fr);gap:8px;margin-bottom:8px}.profile-detail-form .profile-basics .field label{font-size:12px}.profile-detail-form .profile-basics .field input{height:38px;padding:8px 10px;font-size:13px}.profile-detail-form .profile-basics .pick{padding:8px 6px;font-size:12px}.profile-detail-form .interest-grid{gap:6px}.profile-detail-form .interest-grid .pick{padding:7px 4px;border-radius:12px;font-size:10.5px}.profile-detail-save{position:absolute;left:50%;bottom:14px;z-index:5;width:152px;height:42px;padding:0;transform:translateX(-50%);border-radius:21px;font-size:14px}
+.ref-empty{padding:22px;text-align:center;color:#827c92}.ref-empty b{display:block;margin-bottom:6px;color:#373346}
+.picks{display:flex;flex-wrap:wrap;gap:10px;margin:2px 0 4px}
+.pick{padding:10px 18px;border-radius:20px;border:1.5px solid #e5e1d8;background:#fff;font-size:14px;color:#4a4650;cursor:pointer;transition:all .15s}
+.pick.on{background:#f0913c;border-color:#f0913c;color:#fff;font-weight:600}
+.account-provider-brand.apple{position:relative;color:transparent}.account-provider-brand.apple::before{content:'';position:absolute;left:5px;top:7px;width:17px;height:15px;border:2px solid #111;border-radius:48% 48% 45% 45%}.account-provider-brand.apple::after{content:'';position:absolute;left:15px;top:2px;width:8px;height:5px;border:2px solid #111;border-left:0;border-bottom:0;border-radius:0 90% 0 0;transform:rotate(-25deg)}
+.mine-logout{margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="panel">
+  <h2>Lukie 交互原型</h2>
+  <div class="grp">流程</div>
+  <button class="pbtn on" id="btn-restart">引导流程：<br>启动-欢迎页-注册-设备-首页</button>
+  <div class="grp">首页状态（进入首页后切换）</div>
+  <button class="pbtn home-state on" data-s="first">首页-首日态-示例图新手引导</button>
+  <button class="pbtn home-state" data-s="first-postcard">首页-首日态-新手引导后仅明信片</button>
+  <button class="pbtn home-state" data-s="first-empty">首页-日常态-无数据</button>
+  <button class="pbtn home-state" data-s="normal">首页-日常态-有数据（设计稿）</button>
+  <button class="pbtn home-state" data-s="risk">首页-日常态-有数据（高危情绪+成长时刻多文字）</button>
+  <div class="grp">我的</div>
+  <button class="pbtn" id="btn-mine-home">我的</button>
+  <button class="pbtn" id="btn-profile-detail">我的-宝贝档案</button>
+  <button class="pbtn" id="btn-account-management">我的-账号管理</button>
+  <button class="pbtn" id="btn-guide-detail">我的-使用指南</button>
+  <div class="pnote">启动页 → 欢迎页 → 家长/监护人身份确认 → 登录或注册 → 家长授权 → 账号注册成功 → 设备联网 → 设备激活 → 宝贝档案 → 交接仪式 → 首页新手引导 → 首日态（仅初见明信片）→ 首页日常态（无数据 / 有数据 / 有高危数据）→ 成长高光明信片图库 → 明信片图片详情。</div>
+</div>
+
+<div class="phone" id="phone">
+  <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="scr splash-screen" id="splash">
+    <img src="assets/lukie-splash.png" alt="Lukie 启动页">
+  </div>
+
+  <div class="scr" id="s11">
+    <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="ob-illus">
+      <img class="welcome-hero" src="assets/welcome-concept-a-memory-post-office-transparent.png" alt="Lukie 将孩子的成长片段整理成明信片并寄给家长">
+    </div>
+    <div class="ob-body">
+      <div class="ob-title">有一位<br>会寄成长明信片的伙伴<br>正在等你...</div>
+      <div class="welcome-copy">Lukie 是一位人工智能伙伴，会陪孩子聊天、玩耍，把每天的开心、好奇和小故事，绘成一张张成长的高光明信片，寄到你手中。</div>
+      <div class="welcome-belief">成长的每个小瞬间，你都不会错过</div>
+    </div>
+    <div class="ob-foot"><button class="btn org" data-go="s13">去见见 Lukie</button></div>
+  </div>
+
+  <div class="scr login-screen" id="s12">
+    <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="ob-body login-body">
+      <div class="login-brand"><div class="login-logo">Lukie</div><p>登录以连接 Lukie，开启你们的旅程</p></div>
+
+      <div class="login-label"><span>手机号</span><span class="login-label-note">仅支持中国大陆手机号</span></div>
+      <div class="login-input"><span class="login-prefix">+86</span><input id="phone-num" placeholder="请输入手机号" maxlength="11" inputmode="numeric"></div>
+
+      <div class="login-label" style="margin-top:14px">验证码</div>
+      <div class="login-input"><input id="phone-code" placeholder="请输入 6 位验证码" maxlength="6" inputmode="numeric"><button class="code-send" id="btn-send-code">获取验证码</button></div>
+
+      <div class="consents">
+        <label class="consent"><input class="login-consent" type="checkbox"><span>我已阅读并同意 <a>《隐私政策》</a> 与 <a>《用户协议》</a></span></label>
+        <label class="consent"><input class="login-consent" type="checkbox"><span>我同意根据 <a>《个人信息第三方共享清单》</a> 向合作伙伴提供必要信息</span></label>
+      </div>
+
+      <button class="btn org login-main" id="btn-phone-login">登录或注册</button>
+
+      <div class="login-divider">其他登录方式</div>
+      <button class="social-login" data-social="gmail"><span class="google-mark">G</span>使用 Google 登录</button>
+      <button class="social-login" data-social="apple"><span class="apple-mark"></span>使用 Apple 登录</button>
+    </div>
+  </div>
+
+  <div class="scr" id="s13">
+    <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="ob-body guardian-body">
+      <div class="guardian-title">请先由家长完成设置</div>
+      <div class="guardian-intro">Lukie 面向儿童提供服务，需要由监护人完成账号注册、授权、设备联网和激活等步骤的设置，完成后，再将 Lukie 交给孩子使用。<br>请确认您是孩子的家长或监护人</div>
+      <img class="guardian-illustration" src="assets/guardian-family-lukie.png" alt="家长陪伴孩子与 Lukie">
+      <div class="legal-card" hidden>
+        <section class="legal-lead">
+          <p>尊敬的家长/监护人：</p>
+          <p>您正在为孩子设置 Lukie App。在孩子开始使用前，我们需要确认您的家长/监护人身份并获得可验证授权。</p>
+          <h3>关于 Lukie 与 Lukie 小机器人</h3>
+          <p>Lukie 是一款 AI 陪伴硬件设备，Lukie App 是家长侧的数据洞察与情感连接平台，帮助家长了解孩子的情绪状态、兴趣成长并留存珍贵记忆。</p>
+        </section>
+
+        <div class="legal-summary"><b>授权内容摘要</b><span>我们仅为提供陪伴、内容个性化和设备安全服务，收集必要的儿童资料、语音互动与设备使用信息。</span><span>您可以随时访问、更正、删除相关信息或撤回授权。</span></div>
+        <button class="legal-expand" id="legal-toggle" type="button">展开全部详情</button>
+        <div class="legal-details" id="legal-details">
+
+        <h3>儿童信息</h3>
+        <p>Lukie 会在经过父母或法定监护人（“家长”）提供经过核实的授权之后收集、使用或披露其子女的个人信息。如果孩子的父母或监护人未提供授权，Lukie 不会收集、使用或披露任何个人数据。</p>
+        <p>您可以随时通过 Lukie 应用所载明的联系方式联系我们删除 Lukie 机器人中关于您孩子的信息。如果您得知您的孩子未经您同意向我们提供个人信息，可以通过 contact@lukie.ai 联系我们。</p>
+        <p>如果我们发现收集了任何违反适用法律的个人信息，会迅速采取措施删除这些信息，并终止孩子的账户，除非我们有法律义务保留这些信息。我们在 Lukie 上不使用任何广告追踪器（如像素标签等）来针对儿童进行定向或营销。</p>
+
+        <h3>我们需要您授权什么</h3>
+        <p>我们仅收集儿童在参与 Lukie 服务中合理必要的个人信息，且须获得可验证的家长同意，符合儿童隐私保护相关法律的要求。在您授权之前，您的孩子将无法使用 Lukie App 的任何功能。我们也不会收集您孩子的任何个人信息（用于年龄识别的出生日期和国家信息除外）。</p>
+        <ul>
+          <li><b>称呼：</b>用于个性化儿童体验，包括使 Lukie 设备在互动中能直呼孩子的名字。</li>
+          <li><b>性别（可选）：</b>用于个性化互动并使用合适的代词称呼孩子。</li>
+          <li><b>出生日期：</b>用于确定孩子的年龄，并提供适合年龄的内容、特征和推荐。</li>
+          <li><b>儿童兴趣：</b>用于个性化内容推荐、故事、学习模块和互动体验。</li>
+          <li><b>语音录音：</b>用于启用语音互动、训练并识别唤醒词、处理和响应用户指令。儿童的语音录音不会永久保存。</li>
+          <li><b>使用数据：</b>Lukie 机器人使用时长、互动频率和功能使用情况，用于生成总结。</li>
+          <li><b>位置数据（包括 IP 地址）：</b>用于提供符合地理适宜的内容以及遵守内容许可限制。</li>
+          <li><b>设备标识符：</b>用于账户认证、安全与防欺诈、设备功能、会话完整性和技术诊断，仅用于内部运营，不用于广告。</li>
+        </ul>
+        <p>您的孩子使用 Lukie 时，我们通过 Cookie 和类似追踪技术自动收集设备类型、操作系统、IP 地址、Lukie 使用时长、功能点击流、崩溃报告等信息，以帮助我们维护 App 安全和性能。</p>
+
+        <h3>我们如何使用儿童信息</h3>
+        <p>除非法律允许，我们会在获得父母授权后使用儿童信息。Lukie 将存储并识别您孩子的声音数据、人口统计信息及个人偏好，并利用这些数据个性化孩子的体验，提供适合其年龄的体验。</p>
+        <p>您的孩子在使用服务时所提供的个人信息，除非您删除或通过系统设置拒绝我们收集，否则将在您使用服务期间持续授权我们使用。在您或您的孩子注销账号时，我们将停止使用并删除孩子的个人信息。</p>
+        <p>我们可能与公众或第三方共享不包含您孩子任何身份识别信息的统计信息，用于产品开发、服务优化和安全保障。对本政策未载明的其他用途，我们会通过您主动勾选的形式事先征求同意。</p>
+
+        <h3>数据保留</h3>
+        <p>Lukie 致力于数据最小化原则。我们仅保留从儿童处收集的个人信息，直到实现其特定目的所需的合理必要时间。如果收集目的已结束，从儿童在线收集的个人信息不会被无限期保留。</p>
+        <table class="legal-table"><thead><tr><th>数据类别</th><th>保留期</th></tr></thead><tbody>
+          <tr><td>账户信息</td><td>账户活跃期间保留；非活跃后 24 个月内删除；用户要求删除账号时立即删除。</td></tr>
+          <tr><td>同意验证记录</td><td>账户关闭后保留 8 年，用于法律辩护和监管审计追踪。</td></tr>
+          <tr><td>儿童资料（昵称、性别、兴趣）</td><td>与账户信息相同。</td></tr>
+          <tr><td>互动数据：回答</td><td>与账户信息相同。</td></tr>
+          <tr><td>互动数据：语音</td><td>仅短时间保留；用户要求清除时立即清除。</td></tr>
+          <tr><td>技术日志与分析</td><td>与账户信息相同。</td></tr>
+          <tr><td>用户反馈记录</td><td>从反馈之日起保留 2 年后安全删除。</td></tr>
+        </tbody></table>
+        <p>如果账户连续 24 个月没有登录或有意义的互动，则视为“非活跃状态账户”。在非活跃期间届满前 30 天，Lukie 会通过电子邮件通知您，账户及相关儿童数据将被永久删除，除非执行自愿保留操作。</p>
+
+        <h3>第三方服务商共享清单</h3>
+        <p>为了向您的孩子提供更完善、优质的产品和服务，我们将授权商业合作伙伴提供部分服务，并可能与合作伙伴共享您孩子的某些个人信息。我们仅会出于合法、正当、必要、特定、明确的目的共享提供服务所必要的信息，并对信息数据的输出形式、流转、使用进行安全评估与处理。具体合作伙伴请查阅《个人信息第三方共享清单》。</p>
+
+        <h3>您的权利</h3>
+        <p><b>访问及更正：</b>如您希望访问或更正您孩子的个人信息，可以通过本隐私政策载明的方式与我们联系。</p>
+        <p><b>删除：</b>处理目的已实现、无法实现或不再必要；我们已停止提供产品或服务；您已明确撤回同意；我们违反法律、行政法规或约定处理个人信息；或法律、行政法规规定的其他情形时，我们将主动删除，您也有权请求删除。</p>
+        <p><b>安全删除：</b>活跃数据库和文件系统中的数据会使用加密抹除、数据库覆盖或匿名化等安全方法处理。备份中的数据处于无法使用状态，经加密和严格访问控制，并将按备份轮换计划（例如每 90 天）覆盖。我们还会要求相关第三方服务商删除相关数据。</p>
+        <p><b>改变授权范围：</b>您可以通过设备权限设置或本隐私政策载明的联系方式改变同意范围或撤回授权。撤回同意后，我们将无法继续提供对应服务，但不影响此前基于您授权而开展的个人信息处理服务。</p>
+        <p><b>注销账户：</b>您可以通过【我的-注销账号】提交申请。我们会在验证身份后十五日内尽快处理。注销不可逆，我们将停止提供服务、不再收集儿童个人信息，并依据您的要求删除或匿名化处理相关信息。</p>
+        <p><b>响应请求：</b>为保障安全，您可能需要提供书面请求或证明身份。对合理请求原则上不收费；对多次重复、超出合理限度的请求，可能收取一定成本费用；对无端重复、需要过多技术手段、给他人合法权益带来风险或非常不切实际的请求，我们可能予以拒绝。</p>
+
+        <h3>如何完成授权</h3>
+        <p>请您阅读完本内容后在 APP 内确认您的授权。</p>
+
+        <h3>更多信息</h3>
+        <p>我们的完整隐私政策可在 Lukie App 内查看。如有任何疑惑，请通过 contact@lukie.ai 联系我们。</p>
+        <p>感谢您对 Lukie 的信任。<br>Lukie 团队</p>
+        </div>
+      </div>
+    </div>
+    <div class="guardian-foot">
+      <button class="btn org" id="btn-guardian-continue">确认我是家长/监护人</button>
+    </div>
+  </div>
+
+  <div class="scr" id="s15">
+    <div class="dots"><i></i><i></i><i class="on"></i><i></i></div>
+    <div class="ob-body">
+      <div class="activation-head">
+        <div class="activation-head-copy"><h2>Lukie 激活成功啦</h2><p>还差最后一步，Lukie 就可以和宝贝见面啦！</p></div>
+      </div>
+      <div class="profile-card profile-basics">
+        <div class="profile-section-head"><h3>给 Lukie 介绍一下宝贝</h3></div>
+        <div class="field"><label>宝贝称呼</label><input id="kid-name" placeholder="比如：小雨"></div>
+        <div class="field"><label>宝贝生日</label><input id="kid-birthday" type="date"></div>
+        <div class="field"><label>宝贝性别</label>
+          <div class="picks" data-single><span class="pick">男孩</span><span class="pick">女孩</span></div>
+        </div>
+      </div>
+      <div class="profile-card">
+        <div class="profile-section-head"><h3>告诉 Lukie 宝贝喜欢什么？</h3></div>
+        <div class="interest-grid" id="interests">
+          <span class="pick">体育运动</span><span class="pick">科技发明</span><span class="pick">恐龙世界</span>
+          <span class="pick">交通机械</span><span class="pick">科学实验</span><span class="pick">宇宙太空</span>
+          <span class="pick">文学阅读</span><span class="pick">音乐节奏</span><span class="pick">动物自然</span>
+          <span class="pick">绘画手工</span><span class="pick">积木建造</span><span class="pick">益智游戏</span>
+          <span class="pick">角色扮演</span><span class="pick">美食烘焙</span>
+        </div>
+      </div>
+      <div class="profile-note">信息用于为您提供更加个性化的体验，后续可在「我的」中进行修改</div>
+    </div>
+    <div class="ob-foot"><button class="btn org" id="btn-profile-save" data-go="s31" disabled>保存并继续</button><button class="btn ghost" data-go="s31">先不填，和Lukie慢慢探索</button></div>
+  </div>
+
+  <div class="scr" id="s21">
+    <div class="dots"><i></i><i class="on"></i><i></i><i></i></div>
+    <div class="ob-body bind-ready">
+      <div class="bind-success">
+        <div class="bind-success-row"><div class="success-orb" aria-hidden="true"></div><h2>账号注册成功！</h2></div>
+        <div class="bind-guide-title">接下来，将 Lukie连接WIFI并激活</div>
+      </div>
+      <div class="bind-steps">
+        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">1</div><div class="bind-copy"><b>确认 Lukie 已开机</b><span>长按设备左侧按键 3 秒，看到头部指示灯亮起。</span></div></div><div class="bind-shot power" aria-hidden="true"></div></div>
+        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">2</div><div class="bind-copy"><b>找到 Lukie-xxxx 热点</b><span>打开手机 Wi-Fi，在网络列表中选择 Lukie-xxxx。</span></div></div><div class="bind-shot hotspot" aria-hidden="true"></div></div>
+        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">3</div><div class="bind-copy"><b>选择 Wi-Fi 并连接</b><span>选择家庭 2.4G Wi-Fi，输入密码完成联网。</span></div></div><div class="bind-shot wifi" aria-hidden="true"></div></div>
+      </div>
+      <div class="bind-tip">请先将 Lukie 留在家长身边，激活成功后再交给孩子。</div>
+    </div>
+    <div class="ob-foot"><button class="btn org" data-go="s25">已完成WiFi连接，继续激活</button></div>
+  </div>
+
+  <div class="scr" id="s23">
+    <div class="dots"><i></i><i class="on"></i><i></i><i></i></div>
+    <div class="ob-body" style="padding-top:24px"><div class="ob-title">连接 Lukie 的热点</div><div class="ob-text">长按 Lukie 左侧按键 3 秒，听到“嘟”声后，去系统 Wi-Fi 里连接 <b>Lukie-8F3A</b>。</div>
+      <div class="progress-note" id="scan-note">正在寻找 Lukie…</div>
+      <div class="spinner" id="scan-spin"></div>
+      <div class="errbox" id="err-a"><b>没找到 Lukie 的热点</b><br>没听到“嘟”声吗？再长按左侧按键一次试试。</div>
+    </div>
+    <div class="ob-foot"><button class="btn" id="btn-found" style="display:none">已连接 Lukie-8F3A，下一步</button><button class="btn ghost" id="btn-retry-a" style="display:none">重试</button></div>
+  </div>
+
+  <div class="scr" id="s24">
+    <div class="dots"><i></i><i class="on"></i><i></i><i></i></div>
+    <div class="ob-body" style="padding-top:24px"><div class="ob-title">选择家里的 Wi-Fi</div>
+      <div class="warn24">⚠️ Lukie 只支持 2.4G Wi-Fi，5G 网络会连接失败</div>
+      <div class="wifirow" data-wifi="home"><span>HomeSweetHome</span><span class="lock">🔒 2.4G</span></div>
+      <div class="wifirow" data-wifi="5g"><span>HomeSweetHome_5G</span><span class="lock">🔒 5G</span></div>
+      <div class="wifirow" data-wifi="nb"><span>Neighbor_WiFi</span><span class="lock">🔒</span></div>
+      <div class="field" id="wifi-pass" style="display:none;margin-top:14px"><label>密码</label><input type="password" placeholder="输入 Wi-Fi 密码"></div>
+      <div class="errbox" id="err-c"></div>
+    </div>
+    <div class="ob-foot"><button class="btn" id="btn-connect" style="display:none">连接此 Wi-Fi</button><button class="btn ghost" id="btn-retry-c" style="display:none">重试</button></div>
+  </div>
+
+  <div class="scr" id="s25">
+    <div class="dots"><i></i><i class="on"></i><i></i><i></i></div>
+    <div class="ob-body pair-body">
+      <div class="pair-title">激活 Lukie</div>
+      <div class="pair-subtitle">Lukie 会语音播报或在屏幕上展示一组 6 位数字，请完整输入</div>
+      <div class="pair-hero" aria-hidden="true"><span class="activation-screen-code" id="activation-screen-code">000000</span></div>
+      <div class="pair-code-card">
+        <div class="pair-code-title">输入 Lukie 的 6 位激活码</div>
+        <div class="code-input"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"></div>
+        <div class="errbox" id="err-d"><b>激活码不正确</b><br>请确认 Lukie 播报或屏幕展示的 6 位数字后重试。</div>
+      </div>
+    </div>
+    <div class="ob-foot"><button class="btn org" id="btn-activate">激活 Lukie</button></div>
+  </div>
+
+  <div class="scr" id="s31">
+    <div class="dots"><i></i><i></i><i></i><i class="on"></i></div>
+    <div class="ob-body story-body">
+      <div class="story-intro">
+        <h2>现在，可以把 Lukie 交给孩子啦</h2>
+        <p>他们的故事，从这里开始 ✨</p>
+      </div>
+      <div class="story-illustration">
+        <img src="assets/story-handdrawn.png" alt="Lukie 和孩子的故事三章：从第一句 Hi Lukie 开始，一起聊天探索成长，写下属于他们的故事" class="story-handdrawn-img">
+      </div>
+    </div>
+    <div class="ob-foot"><button class="btn org" id="btn-meet-home">开启和Lukie的故事</button></div>
+  </div>
+  <div class="scr" id="home">
+    <div class="home-scroll" id="home-body"></div>
+    <div class="tabbar">
+      <div class="tab on" data-tab="today"><span class="ic">✉️</span>今天</div>
+      <div class="tab" data-tab="growth"><span class="ic">🌱</span>成长</div>
+      <div class="tab" data-tab="mine"><span class="ic">⚙️</span>我的</div>
+    </div>
+  </div>
+
+  <div class="scr" id="postcard-gallery">
+    <div class="gallery-page">
+      <div class="gallery-head"><button class="gallery-back" id="gallery-back" aria-label="返回首页">‹</button><h1>成长高光明信片</h1></div>
+      <div class="gallery-sub">按时间收藏宝贝的每个高光瞬间</div>
+      <div class="gallery-grid">
+        <button class="gallery-item" data-gallery-src="assets/growth-postcard-future-painter.png" data-gallery-meta="2026年1月1日 · 18:57"><img src="assets/growth-postcard-future-painter.png" alt="宝贝画画的成长明信片"><span class="gallery-meta">1月1日<br>18:57</span></button>
+        <button class="gallery-item" data-gallery-src="assets/first-meeting-home.png" data-gallery-meta="2026年1月1日 · 12:59"><img src="assets/first-meeting-home.png" alt="宝贝和 Lukie 初见"><span class="gallery-meta">1月1日<br>12:59</span></button>
+        <button class="gallery-item" data-gallery-src="assets/story-first-watercolor-v2.png" data-gallery-meta="2026年1月1日 · 09:34"><img src="assets/story-first-watercolor-v2.png" alt="宝贝成长故事"><span class="gallery-meta">1月1日<br>09:34</span></button>
+        <button class="gallery-item" data-gallery-src="assets/story-journey-watercolor-v2.png" data-gallery-meta="2025年12月30日 · 19:08"><img src="assets/story-journey-watercolor-v2.png" alt="宝贝探索时刻"><span class="gallery-meta">12月30日<br>19:08</span></button>
+        <button class="gallery-item" data-gallery-src="assets/first-meeting-replay.png" data-gallery-meta="2025年12月30日 · 16:20"><img src="assets/first-meeting-replay.png" alt="初见纪念"><span class="gallery-meta">12月30日<br>16:20</span></button>
+        <button class="gallery-item" data-gallery-src="assets/story-handdrawn.png" data-gallery-meta="2025年12月30日 · 10:42"><img src="assets/story-handdrawn.png" alt="手绘成长故事"><span class="gallery-meta">12月30日<br>10:42</span></button>
+        <button class="gallery-item" data-gallery-src="assets/welcome-concept-a-memory-post-office.png" data-gallery-meta="2025年12月29日 · 20:36"><img src="assets/welcome-concept-a-memory-post-office.png" alt="成长明信片"><span class="gallery-meta">12月29日<br>20:36</span></button>
+        <button class="gallery-item" data-gallery-src="assets/story-journey-watercolor.png" data-gallery-meta="2025年12月29日 · 15:08"><img src="assets/story-journey-watercolor.png" alt="成长旅程"><span class="gallery-meta">12月29日<br>15:08</span></button>
+        <button class="gallery-item" data-gallery-src="assets/coach-intro-lukie.png" data-gallery-meta="2025年12月29日 · 09:12"><img src="assets/coach-intro-lukie.png" alt="Lukie 陪伴时刻"><span class="gallery-meta">12月29日<br>09:12</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scr" id="postcard-detail">
+    <div class="postcard-detail-page">
+      <button class="gallery-back postcard-detail-back" id="postcard-detail-back" aria-label="返回上一页">‹</button>
+      <div class="postcard-detail-stage"><img id="postcard-detail-image" alt="成长高光明信片详情"></div>
+      <div class="postcard-detail-meta" id="postcard-detail-meta"></div>
+    </div>
+  </div>
+
+<div class="scr" id="profile-detail">
+    <div class="profile-detail-page">
+      <div class="profile-detail-head"><button class="gallery-back" id="profile-detail-back" aria-label="返回我的">‹</button><h1>宝贝档案</h1></div>
+      <div class="profile-detail-form">
+        <div class="profile-card profile-basics">
+          <div class="profile-section-head"><h3>给 Lukie 介绍一下宝贝</h3></div>
+          <div class="field"><label>宝贝称呼</label><input id="edit-kid-name" placeholder="比如：小雨"></div>
+          <div class="field"><label>宝贝生日</label><input id="edit-kid-birthday" type="date"></div>
+          <div class="field"><label>宝贝性别</label><div class="picks" id="edit-kid-gender" data-single><span class="pick">男孩</span><span class="pick">女孩</span></div></div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-section-head"><h3>告诉 Lukie 宝贝喜欢什么？</h3></div>
+          <div class="interest-grid" id="edit-interests">
+            <span class="pick">体育运动</span><span class="pick">科技发明</span><span class="pick">恐龙世界</span>
+            <span class="pick">交通机械</span><span class="pick">科学实验</span><span class="pick">宇宙太空</span>
+            <span class="pick">文学阅读</span><span class="pick">音乐节奏</span><span class="pick">动物自然</span>
+            <span class="pick">绘画手工</span><span class="pick">积木建造</span><span class="pick">益智游戏</span>
+            <span class="pick">角色扮演</span><span class="pick">美食烘焙</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn org profile-detail-save" id="profile-detail-save" type="button">保存</button>
+    </div>
+  </div>
+
+  <div class="scr" id="guide-detail">
+    <div class="guide-detail-page">
+      <div class="guide-detail-head"><button class="gallery-back" id="guide-detail-back" aria-label="返回我的">‹</button><h1>使用指南</h1></div>
+      <p class="guide-detail-subtitle">按场景查看操作，卡片内已汇总语音、按键和屏幕反馈</p>
+      <div class="guide-list">
+        <button class="guide-item" type="button" data-guide-topic="power"><span class="guide-item-icon">⏻</span><b>开机、唤醒与关机</b><span class="guide-item-desc">从开机到对话，一次看懂按键和唤醒</span></button>
+        <button class="guide-item" type="button" data-guide-topic="voice"><span class="guide-item-icon">🎙</span><b>语音控制</b><span class="guide-item-desc">音量、亮度、文字、字号都能动口调</span></button>
+        <button class="guide-item" type="button" data-guide-topic="quick"><span class="guide-item-icon">◀▶</span><b>快捷设置</b><span class="guide-item-desc">左右键组合进入，五项设置即按即调</span></button>
+        <button class="guide-item" type="button" data-guide-topic="connect"><span class="guide-item-icon">📶</span><b>WiFi 联网与激活</b><span class="guide-item-desc">扫描、连接、激活每一步都有全屏引导</span></button>
+        <button class="guide-item" type="button" data-guide-topic="display"><span class="guide-item-icon">☼</span><b>屏幕、状态与电量</b><span class="guide-item-desc">字号、排版、充电和低电量提醒说明</span></button>
+        <button class="guide-item" type="button" data-guide-topic="alarm"><span class="guide-item-icon">⏰</span><b>闹钟</b><span class="guide-item-desc">语音设置或取消，全屏倒计时到点提醒</span></button>
+        <button class="guide-item" type="button" data-guide-topic="translate"><span class="guide-item-icon">🌐</span><b>翻译模式</b><span class="guide-item-desc">中英双向直译，双语实时常驻屏幕</span></button>
+        <button class="guide-item" type="button" data-guide-topic="energy"><span class="guide-item-icon">🎴</span><b>每日能量签</b><span class="guide-item-desc">每天摇一摇，抽一签给今天一点能量</span></button>
+        <button class="guide-item" type="button" data-guide-topic="breathing"><span class="guide-item-icon">◉</span><b>呼吸训练</b><span class="guide-item-desc">跟随圆球吸气 4 秒、呼气 6 秒</span></button>
+        <button class="guide-item" type="button" data-guide-topic="modes"><span class="guide-item-icon">✨</span><b>故事、百科与陪伴</b><span class="guide-item-desc">讲故事、百科问答、心情陪伴等玩法</span></button>
+        <button class="guide-item guide-help-link" type="button" data-open-help><span class="guide-item-icon">?</span><b>更多使用帮助</b><span class="guide-item-desc">查看产品基础、联网、电量与功能问答</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="scr" id="guide-topic">
+    <div class="guide-topic-page">
+      <div class="guide-topic-head"><button class="gallery-back" id="guide-topic-back" aria-label="返回使用指南">‹</button><h1 id="guide-topic-title">功能指引</h1></div>
+      <p class="guide-topic-intro" id="guide-topic-intro"></p>
+      <div id="guide-topic-content"></div>
+    </div>
+  </div>
+
+  <div class="scr" id="guide-dialogue">
+    <div class="guide-dialogue-page">
+      <button class="gallery-back" id="guide-dialogue-back" aria-label="返回使用指南">‹</button>
+      <h1 class="guide-dialogue-head">与 Lukie 对话</h1>
+      <p class="guide-dialogue-intro">两种方式都可以唤醒 Lukie，开始一段自然对话。</p>
+      <div class="guide-dialogue-steps">
+        <article class="guide-dialogue-step"><span class="guide-dialogue-num">1</span><div class="guide-dialogue-step-content"><b>语音唤醒 Lukie</b><p>直接说「Hi, Lukie」，即可唤醒设备并开始对话。</p><div class="guide-dialogue-gif-placeholder" aria-label="步骤 1 GIF 占位">GIF 1</div></div></article>
+        <article class="guide-dialogue-step"><span class="guide-dialogue-num">2</span><div class="guide-dialogue-step-content"><b>按住右键开始对话</b><p>按住右键，出现小耳朵，即可开始对话；说完后松开右键。</p><div class="guide-dialogue-gif-placeholder" aria-label="步骤 2 GIF 占位">GIF 2</div></div></article>
+      </div>
+    </div>
+  </div>
+
+  <div class="scr" id="guide-wifi">
+    <div class="guide-wifi-page">
+      <button class="gallery-back" id="guide-wifi-back" aria-label="返回使用指南">‹</button>
+      <div class="bind-steps">
+        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">1</div><div class="bind-copy"><b>确认 Lukie 已开机</b><span>长按设备左侧按键 3 秒，看到头部指示灯亮起。</span></div></div><div class="bind-shot power" aria-hidden="true"></div></div>
+        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">2</div><div class="bind-copy"><b>找到 Lukie-xxxx 热点</b><span>打开手机 Wi-Fi，在网络列表中选择 Lukie-xxxx。</span></div></div><div class="bind-shot hotspot" aria-hidden="true"></div></div>
+        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">3</div><div class="bind-copy"><b>选择 Wi-Fi 并连接</b><span>选择家庭 2.4G Wi-Fi，输入密码完成联网。</span></div></div><div class="bind-shot wifi" aria-hidden="true"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scr" id="help-center">
+    <div class="help-center-page">
+      <div class="help-center-head"><button class="gallery-back" id="help-center-back" aria-label="返回我的">‹</button><h1>帮助中心</h1></div>
+      <section class="help-group">
+        <h2 class="help-group-title">产品基础</h2>
+        <details class="help-question" open><summary>Lukie 的尺寸和重量是多少？</summary><div class="help-answer"><p>Lukie 尺寸为 750mm × 600mm × 230mm，净重 57g。</p></div></details>
+        <details class="help-question" open><summary>Lukie 的材质对孩子安全吗？</summary><div class="help-answer"><p>Lukie 采用环保 ABS+PC 材料，达到食品接触级安全标准，无毒无异味。机身为圆角设计，没有尖锐边角，更适合儿童安全使用。</p></div></details>
+        <details class="help-question" open><summary>Lukie 有内置摄像头吗？</summary><div class="help-answer"><p>没有。Lukie 不配备摄像头，以更好地保护孩子隐私。</p></div></details>
+        <details class="help-question" open><summary>Lukie 可以连接耳机吗？</summary><div class="help-answer"><p>目前暂不支持连接耳机。</p></div></details>
+      </section>
+      <section class="help-group">
+        <h2 class="help-group-title">联网与 App</h2>
+        <details class="help-question" open><summary>Lukie 必须连接 Wi-Fi 才能使用吗？</summary><div class="help-answer"><p>是的。Lukie 采用云端大模型框架，语音数据会上传至云端进行计算并返回语音反馈，因此需要在 Wi-Fi 网络连接下使用。</p></div></details>
+        <details class="help-question" open><summary>日常使用必须依赖手机 App 吗？</summary><div class="help-answer"><p>App 只用于首次设备激活和家长管理，例如查看孩子成长记录、解绑设备等。完成 Wi-Fi 设置后，孩子日常可以直接使用 Lukie，不需要家长手机参与，减少孩子对手机的依赖。</p></div></details>
+        <details class="help-question" open><summary>Lukie 有哪些接口？</summary><div class="help-answer"><p>Lukie 底部仅有一个 Type-C 接口，支持 5V/1A Type-C 充电和数据传输。</p></div></details>
+      </section>
+      <section class="help-group">
+        <h2 class="help-group-title">电量与按键</h2>
+        <details class="help-question" open><summary>电池续航和充电时间是多少？</summary><div class="help-answer"><p>L1 型号配备 650mAh 电池，额定电压 3.7V。待机最长可达 72 小时；在 50% 音量下连续语音聊天约 4-6 小时，实际续航以使用情况为准。请使用认证 5V/1A Type-C 适配器充电，充满约需 1.5-2 小时。</p></div></details>
+        <details class="help-question" open><summary>实体按键怎么操作？</summary><div class="help-answer"><p>开机：长按左键 3 秒。<br><br>关机：同时长按左键和右键 3 秒。<br><br>语音唤醒：直接说「Hi, Lukie」，即可连续多轮对话，无需反复唤醒。<br><br>手动唤醒：按住右键说话，说完后松开右键。</p></div></details>
+        <details class="help-question" open><summary>屏幕亮度可以调节吗？</summary><div class="help-answer"><p>可以。Lukie 屏幕显示清晰，亮度可通过语音指令调节。</p></div></details>
+      </section>
+      <section class="help-group">
+        <h2 class="help-group-title">AI 功能</h2>
+        <details class="help-question" open><summary>如何切换不同的自定义 AI 智能体？</summary><div class="help-answer"><p>双击左键即可在不同 AI 个性之间切换。</p></div></details>
+        <details class="help-question" open><summary>Lukie 可以讲故事吗？</summary><div class="help-answer"><p>可以。Lukie 支持原创 AI 生成的睡前故事和日常故事；暂不支持有版权的商业故事内容。</p></div></details>
+        <details class="help-question" open><summary>Lukie 有互动表情吗？</summary><div class="help-answer"><p>有。Lukie 配备 21 种动态屏幕表情。</p></div></details>
+      </section>
+      <section class="help-group">
+        <h2 class="help-group-title">日常使用</h2>
+        <details class="help-question"><summary>Lukie 的背景音乐来自哪里？</summary><div class="help-answer"><p>Lukie 不同于普通智能音箱，更关注 6-18 岁孩子的情商培养和英语训练。内置音乐为 AI 生成的舒缓音频，可用于情绪调节、冥想和学习场景。</p></div></details>
+        <details class="help-question" open><summary>Lukie 支持哪些语言？</summary><div class="help-answer"><p>Lukie 支持 37 种语言，包括普通话、粤语、英语、日语、韩语、俄语、法语、德语、西班牙语、意大利语、葡萄牙语、阿拉伯语、泰语、越南语、土耳其语、印地语、印尼语、波兰语、捷克语、罗马尼亚语、乌克兰语、保加利亚语、匈牙利语、瑞典语、希伯来语、克罗地亚语、丹麦语、加泰罗尼亚语、斯洛伐克语、斯洛文尼亚语、荷兰语、马来语、菲律宾语、挪威语、波斯语和希腊语。用户可通过专属智能体设置，自定义 AI 音色和语言，用于翻译和对话。</p></div></details>
+        <details class="help-question"><summary>Lukie 支持定位功能吗？</summary><div class="help-answer"><p>目前 Lukie 不支持定位功能。</p></div></details>
+      </section>
+      <section class="help-group">
+        <h2 class="help-group-title">认证与合规</h2>
+        <details class="help-question" open><summary>Lukie 符合哪些行业认证标准？</summary><div class="help-answer"><p>Lukie 按照 IEC62368、YD/T2583.14-2013、FCC Part 15/22/24/27 及相关标准生产。</p></div></details>
+        <details class="help-question" open><summary>Lukie 符合美国进口和相关监管标准吗？</summary><div class="help-answer"><p>符合。Lukie AI Mini Robot L1 完全符合美国市场儿童玩具强制标准，并可按需提供相关认证和测试文件。产品已通过 ASTM F963-23 美国玩具安全标准测试、基于 16 CFR 1303 和 1307 的 CPSIA 总铅及受限邻苯测试，以及 16 CFR Part 1505 电动玩具安全测试。我们已具备美国 CPSC 要求的 CPC 证书、FCC 认证、COPPA 合规文件，以及跨境运输所需的 UN38.3 报告、DGM 空运鉴定和 MSDS/SDS 文件。所有测试报告均由美国 CPSC 认可的合格第三方实验室出具。</p></div></details>
+      </section>
+    </div>
+  </div>
+
+  <div class="scr" id="account-management">
+    <div class="account-management-page">
+      <div class="account-management-head"><button class="gallery-back" id="account-management-back" aria-label="返回我的">‹</button><h1>账号管理</h1></div>
+      <section class="account-card">
+        <span class="account-card-title">已绑定账号</span>
+        <div class="account-empty">暂无绑定账号</div>
+      </section>
+      <section class="account-card account-provider-card">
+        <span class="account-card-title">添加第三方账号</span>
+        <button class="account-provider" type="button"><span class="account-provider-brand apple" aria-hidden="true"></span><span class="account-provider-label">使用 Apple</span><span class="account-bind">绑定</span></button>
+        <button class="account-provider" type="button"><span class="account-provider-brand google" aria-hidden="true">G</span><span class="account-provider-label">使用 Google</span><span class="account-bind">绑定</span></button>
+      </section>
+      <button class="account-danger" type="button"><span class="mine-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 4h4l1 3H9l1-3zM7 7l.8 13h8.4L17 7M10 10v6M14 10v6"></path></svg></span><span class="mine-row-label">注销账号</span><span class="mine-row-arrow">›</span></button>
+    </div>
+  </div>
+
+  <div class="scr" id="first-meeting-replay">
+    <img class="meeting-replay-image" src="assets/first-meeting-replay.png" alt="宝贝和 Lukie 的初见纪念页">
+    <button class="meeting-replay-back" data-go="home">‹ 返回首页</button>
+  </div>
+
+  <div class="fullpost" id="fullpost">
+    <button class="fp-back" id="fp-close">‹</button>
+    <div class="fp-stamp">Lukie<br>寄出</div>
+    <div class="fp-card">
+      <div class="pc-cover" style="height:200px"><i class="sun"></i><i class="hill"></i><i class="hill2"></i><span class="pc-stamp">AI 生成</span></div>
+      <div class="fp-quote" id="fp-quote">"妈妈！Lukie 说宇航员在太空里也要叠被子，我今天自己叠了！"</div>
+      <div style="font-size:13px;color:#6b6660;line-height:1.7">Lukie 的旁白：宝贝今天对太空着了迷，问了十一个关于星星的问题。还记得上周说想当宇航员吗？今天又向这个梦想靠近了一小步。</div>
+      <div class="fp-sig">—— Lukie · 2026年8月18日 傍晚 · 心情晴 ☀️</div>
+    </div>
+    <div class="fp-actions">
+      <button class="btn" onclick="toast('已收藏进明信片册 📮')">收藏</button>
+      <button class="btn org" onclick="toast('分享图已生成（原型占位）')">分享明信片</button>
+      <button class="btn ghost" style="flex:.7" onclick="toast('播放孩子原声 🎧（原型占位）')">🎧</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="coach">
+    <div class="coach" id="coach-card"></div>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let homeState='first';
+let postcardDetailReturn='home';
+let splashTimer=null;
+let guideBannerDismissed=false;
+
+function openPostcardDetail(src,meta,returnPage){
+  postcardDetailReturn=returnPage;
+  $('#postcard-detail-image').src=src;
+  $('#postcard-detail-meta').textContent=meta;
+  go('postcard-detail');
+}
+
+/* ---------- 基础路由 ---------- */
+function go(id){
+  if(id!=='splash'&&splashTimer){clearTimeout(splashTimer);splashTimer=null;}
+  if(id==='home-first'){homeState='first';renderHome('first');id='home';}
+  if(id==='home-normal'){homeState='normal';renderHome('normal');id='home';}
+  $$('.scr').forEach(e=>e.classList.remove('on'));
+  const t=document.getElementById(id);
+  if(t)t.classList.add('on');
+  if(id==='s23')startScan();
+  if(id==='s25')renderActivationCode();
+}
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');
+  if(g){go(g.dataset.go);}
+});
+
+/* ---------- 开关 ---------- */
+$$('.sw').forEach(s=>s.addEventListener('click',()=>s.classList.toggle('on')));
+
+/* ---------- 选项 chips（性别单选 / 兴趣多选） ---------- */
+function updateProfileSaveState(){
+  const screen=$('#s15');
+  const hasInput=[...screen.querySelectorAll('input')].some(input=>input.value.trim());
+  const hasSelection=!!screen.querySelector('.pick.on');
+  $('#btn-profile-save').disabled=!(hasInput||hasSelection);
+}
+$('#s15').addEventListener('input',updateProfileSaveState);
+document.addEventListener('click',e=>{
+  const p=e.target.closest('.pick');if(!p)return;
+  if(p.parentElement.hasAttribute('data-single')){
+    [...p.parentElement.children].forEach(x=>x.classList.remove('on'));p.classList.add('on');
+  }else{p.classList.toggle('on');}
+  if(p.closest('#s15'))updateProfileSaveState();
+});
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+function groupLegalSections(){
+  const container=$('#legal-details');
+  const items=[...container.children];
+  container.replaceChildren();
+  let section;
+  items.forEach(item=>{
+    if(!section||item.tagName==='H3'){
+      section=document.createElement('section');
+      section.className='legal-section';
+      container.appendChild(section);
+    }
+    section.appendChild(item);
+  });
+}
+groupLegalSections();
+$('#legal-toggle').addEventListener('click',()=>{
+  const details=$('#legal-details');
+  const expanded=details.classList.toggle('on');
+  $('#legal-toggle').classList.toggle('on',expanded);
+  $('#legal-toggle').textContent=expanded?'收起全部详情':'展开全部详情';
+});
+
+function validPhone(){return /^1\d{10}$/.test($('#phone-num').value.trim());}
+$('#btn-send-code').addEventListener('click',()=>{
+  if(!validPhone()){toast('请输入正确的中国大陆手机号');return;}
+  toast('验证码已发送（原型模拟）');
+});
+function hasLoginConsent(){return $$('.login-consent').every(input=>input.checked);}
+function requireLoginConsent(){
+  if(hasLoginConsent())return true;
+  toast('请先阅读并同意相关协议');
+  return false;
+}
+$('#btn-phone-login').addEventListener('click',()=>{
+  if(requireLoginConsent())go('s21');
+});
+$$('[data-social]').forEach(button=>button.addEventListener('click',()=>{
+  if(!requireLoginConsent())return;
+  toast(button.dataset.social==='gmail'?'Google 登录成功':'Apple 登录成功');
+  setTimeout(()=>go('s21'),600);
+}));
+$('#btn-guardian-continue').addEventListener('click',()=>{
+  go('s12');
+});
+
+/* ---------- 第三幕 S23：搜热点（分支A演示） ---------- */
+function startScan(){
+  $('#err-a').classList.remove('on');
+  $('#btn-found').style.display='none';
+  $('#btn-retry-a').style.display='none';
+  $('#scan-spin').style.display='block';
+  $('#scan-note').textContent='正在寻找 Lukie…';
+  setTimeout(()=>{
+    $('#scan-spin').style.display='none';
+    $('#scan-note').textContent='找到了：Lukie-8F3A ✅';
+    $('#btn-found').style.display='block';
+  },1200);
+}
+$('#btn-retry-a').addEventListener('click',startScan);
+$('#btn-found').addEventListener('click',()=>go('s24'));
+
+/* ---------- 第三幕 S24：选择家庭 Wi-Fi ---------- */
+let wifiSel=null;
+$$('.wifirow').forEach(r=>r.addEventListener('click',()=>{
+  wifiSel=r.dataset.wifi;
+  $$('.wifirow').forEach(x=>x.style.background='');
+  r.style.background='#fdf3e7';
+  $('#err-c').classList.remove('on');
+  if(wifiSel==='5g'){
+    $('#wifi-pass').style.display='none';
+    $('#btn-connect').style.display='none';
+    $('#err-c').innerHTML='<b>Lukie 只支持 2.4G Wi-Fi</b><br>请选不带 _5G 后缀的那个，大多数路由器两个名字是同一个网络。';
+    $('#err-c').classList.add('on');
+  }else if(wifiSel==='nb'){
+    $('#wifi-pass').style.display='none';
+    $('#btn-connect').style.display='none';
+    $('#err-c').innerHTML='<b>这是邻居家的网络哦</b><br>选择自己家的 Wi-Fi 才能让 Lukie 在家联网。';
+    $('#err-c').classList.add('on');
+  }else{
+    $('#wifi-pass').style.display='block';
+    $('#btn-connect').style.display='block';
+    $('#btn-retry-c').style.display='none';
+  }
+}));
+$('#btn-connect').addEventListener('click',()=>{
+  const password=$('#wifi-pass input').value;
+  if(!password){toast('请输入 Wi-Fi 密码');return;}
+  const b=$('#btn-connect');b.textContent='连接中…';b.disabled=true;
+  setTimeout(()=>{
+    b.textContent='连接此 Wi-Fi';b.disabled=false;
+    $('#err-c').classList.remove('on');
+    toast('Lukie 已联网 🎉');
+    setTimeout(()=>go('s25'),700);
+  },1200);
+});
+
+/* ---------- Stage 3 S25: device activation ---------- */
+function renderActivationCode(){
+  $('#activation-screen-code').textContent=Array.from({length:6},()=>Math.floor(Math.random()*10)).join('');
+}
+$$('.code-input input').forEach((inp,i,arr)=>{
+  inp.addEventListener('input',()=>{if(inp.value&&i<arr.length-1)arr[i+1].focus();});
+});
+$('#btn-activate').addEventListener('click',()=>{
+  $('#err-d').classList.remove('on');
+  go('s15');
+});
+
+/* ---------- 第四幕：功能引导浮层（初见 → 唤醒 → 指南 → 关注 → 概览 → 明信片 → 成长时刻） ---------- */
+const coaches=[
+  // 第 1 步 · 初见仪式（居中大卡）：自我介绍
+  {type:'ritual',art:'assets/coach-intro-lukie.png',t:'哇，我们终于见面啦！',d:kid=>`${kid}你好，我是 Lukie，你的全能小伙伴，想听故事、聊聊天，还是突然冒出什么奇思妙想，都可以告诉我，我一直都在哦～`},
+  // 第 2 步 · 唤醒方式（居中大卡）：Hi Lukie / 右侧按键 + 小耳朵提示
+  {type:'ritual',t:'随时用”Hi，Lukie”来召唤我',d:()=>`宝贝也可以按住 Lukie 的右侧按键，当我屏幕上出现个“小耳朵”时，就可以直接和我说话啦`},
+  // 第 3 步 · 使用指南：解锁更多 Lukie 玩法
+  {target:'home-guide-banner',d:()=>`解锁Lukie 实时翻译、讲故事、百科知识问答等更多玩法，可前往「我的-使用指南」中查看哦`},
+  // 第 4 步 · 关注区（高亮 home-attention）：值得特别关注的信息优先展示
+  {target:'home-attention',d:()=>`和宝贝的聊天中出现了值得特别关注的信息，Lukie 会优先放在这里，方便你及时了解～`},
+  // 第 5 步 · 今日概览：同时高亮数据概览和今日总结
+  {target:'home-overview',d:kid=>`今天聊了什么、聊了多少次，还有对话中出现的小情绪，我都会整理和总结在这里。`},
+  // 第 6 步 · 成长高光明信片
+  {target:'home-postcards',d:()=>`Lukie 会记录宝贝的特别瞬间，变成一张张成长高光明信片，寄送给你哦～`},
+  // 第 7 步 · 成长时刻：按时间记录每日互动瞬间
+  {target:'home-stream-first',d:()=>`呀，这里是宝贝一天的时光中每个时刻的会话总结哦，你可以看到宝贝做了什么、当时的兴趣和情绪，也能随时点开听听原声哦～`},
+];
+let coachIdx=0;
+function clearCoachFocus(){document.querySelectorAll('.tour-focus').forEach(el=>el.classList.remove('tour-focus'));}
+function finishCoach(){
+  clearCoachFocus();
+  $('#coach').classList.remove('on');
+  $$('.home-state').forEach(button=>button.classList.toggle('on',button.dataset.s==='first-postcard'));
+  renderHome('first-postcard');
+  go('home');
+  $('#home-body').scrollTop=0;
+}
+function showCoach(i){
+  coachIdx=i;
+  clearCoachFocus();
+  const item=coaches[i];
+  const kid=($('#kid-name')&&$('#kid-name').value.trim())||'宝贝';
+  const description=typeof item.d==='function'?item.d(kid):item.d;
+  const target=item.target&&document.getElementById(item.target);
+  if(item.target&&!target){
+    if(i<coaches.length-1)showCoach(i+1);
+    else finishCoach();
+    return;
+  }
+  if(target){target.classList.add('tour-focus');target.scrollIntoView({behavior:'auto',block:'center'});}
+  const defaultLukieArt='<svg viewBox="0 0 150 130" aria-hidden="true"><path d="M35 45 L25 10 L60 30 Z" fill="#f0913c"/><path d="M115 45 L125 10 L90 30 Z" fill="#f0913c"/><path d="M38 40 L32 18 L52 30 Z" fill="#fbc4c4"/><path d="M112 40 L118 18 L98 30 Z" fill="#fbc4c4"/><ellipse cx="75" cy="75" rx="52" ry="46" fill="#f5a04c"/><circle cx="57" cy="70" r="6" fill="#7a4a16"/><circle cx="93" cy="70" r="6" fill="#7a4a16"/><ellipse cx="75" cy="88" rx="9" ry="7" fill="#fbc4c4"/><path d="M66 96 q9 8 18 0" stroke="#7a4a16" stroke-width="3" fill="none" stroke-linecap="round"/></svg>';
+  const lukieArt=`<div class="coach-lukie${item.art?' has-image':''}">${item.art?`<img src="${item.art}" alt="Lukie">`:defaultLukieArt}</div>`;
+  const closeButton='<button class="coach-close" id="coach-close" type="button" aria-label="关闭新手引导">×</button>';
+  const card=$('#coach-card');
+  card.className=`coach${item.type==='ritual'?' coach-ritual coach-center':' coach-inline'}`;
+  $('#coach').classList.add('on');
+  if(item.type==='ritual'){
+    card.innerHTML=`${closeButton}${lukieArt}<div class="coach-step">${i+1} / ${coaches.length}</div><p>${item.t}<br>${description}</p><div class="coach-actions"><button class="btn org" id="coach-next">下一步</button><button class="skip" id="coach-skip">跳过</button></div>`;
+  }else{
+    card.innerHTML=`${closeButton}<div class="coach-step">${i+1} / ${coaches.length}</div><p>${description}</p><div class="coach-actions"><button class="btn org" id="coach-next">${i<coaches.length-1?'下一步':'完成'}</button>${i<coaches.length-1?'<button class="skip" id="coach-skip">跳过</button>':''}</div>`;
+    const phoneRect=$('#phone').getBoundingClientRect();
+    const targetRect=target.getBoundingClientRect();
+    const coachHeight=card.offsetHeight;
+    const safeTop=58;
+    const safeBottom=phoneRect.height-92;
+    const below=targetRect.bottom-phoneRect.top+18;
+    const above=targetRect.top-phoneRect.top-coachHeight-18;
+    const canFitBelow=below+coachHeight<=safeBottom;
+    const canFitAbove=above>=safeTop;
+    const placeAbove=!canFitBelow&&canFitAbove;
+    const maxTop=Math.max(safeTop,safeBottom-coachHeight);
+    const top=Math.min(maxTop,Math.max(safeTop,placeAbove?above:below));
+    card.classList.toggle('coach-above',placeAbove);
+    card.style.setProperty('--coach-top',top+'px');
+  }
+  const coachClose=$('#coach-close');
+  if(coachClose)coachClose.addEventListener('click',finishCoach);
+  $('#coach-next').addEventListener('click',()=>{
+    if(i<coaches.length-1)showCoach(i+1);
+    else finishCoach();
+  });
+  const sk=$('#coach-skip');
+  if(sk)sk.addEventListener('click',finishCoach);
+}
+$('#btn-meet-home').addEventListener('click',()=>{
+  guideBannerDismissed=false;
+  homeState='risk';
+  renderHome('risk');
+  go('home');
+  setTimeout(()=>showCoach(0),420);
+});
+
+/* ---------- 首页五状态渲染（v2 · 星空渐变系） ---------- */
+const zone1='① 天色问候区（氛围，非数据）', zone2='② 今日来信 · 明信片hero', zoneH='③ 今日高光（仅真高光日出现）', zone4='④ 时刻流（竖轴时间线，纯事实）', zone5='⑤ 情绪天气（替代Mood Score）';
+const bars='<i style="height:6px"></i><i style="height:12px"></i><i style="height:8px"></i><i style="height:15px"></i><i style="height:10px"></i><i style="height:17px"></i><i style="height:9px"></i><i style="height:13px"></i><i style="height:7px"></i><i style="height:14px"></i><i style="height:10px"></i><i style="height:6px"></i>';
+function sky(cls,blobCls,kid,title,status){return `
+  <div class="sky ${cls}" data-zone="${zone1}"><div class="stars"></div>
+    <div class="date">8月18日 星期二 · 杭州</div><h1>${title}，${kid}家</h1>
+    <div class="blobrow"><div class="skyblob ${blobCls}"></div><div class="stxt">${status}</div></div>
+  </div>`;}
+function renderHomePostcard(kid,showFirstMeeting,showWaiting){
+  const audio='<div class="ref-audio"><button class="ref-audio-play" type="button" aria-label="播放原声" aria-pressed="false">▶</button><span class="ref-wave">∣∣┃∣┃┃∣┃∣┃∣∣┃</span><time>00:28</time></div>';
+  if(showWaiting){
+    return `<article class="v2card posthero postcard-status" id="home-postcards"><h3 class="postcard-waiting-title"><i class="postcard-envelope" aria-hidden="true"></i><span>今天的明信片正在路上</span></h3><div class="quote">「和 Lukie 说说今天最特别的一件事吧」</div><p>等一个特别的故事发生</p></article>`;
+  }
+  if(showFirstMeeting){
+    return `<article class="ref-card ref-highlight is-meeting-clear" id="home-postcards" data-go="first-meeting-replay"><div class="ref-highlight-copy"><h3>${kid} 和 Lukie<br>第一次见面啦！</h3><p>“你好呀，${kid}！我是 Lukie，以后就住在你家啦。”</p>${audio}</div></article>`;
+  }
+  return `<article class="ref-card ref-highlight is-painter" id="home-postcards"><div class="ref-highlight-copy"><h3>${kid}说长大后想要当<br>一个画家！</h3><p>${kid}多次提到“我想要当画家”，也希望将来用画传递温暖。</p>${audio}</div></article>`;
+}
+function renderGuideBanner(){
+  if(guideBannerDismissed)return '';
+  return `<aside class="guide-banner" id="home-guide-banner" aria-label="使用指南推荐"><div class="guide-banner-copy"><strong>Lukie 还有更多好玩的本领</strong><span>实时翻译、百科问答等玩法，等你来解锁</span></div><button class="guide-banner-action" type="button" data-open-guide>去查看</button><button class="guide-banner-close" type="button" data-dismiss-guide aria-label="关闭使用指南推荐">×</button></aside>`;
+}
+function setupPromptMarquee(attempt=0){
+  const promptViewport=$('.ref-prompt-viewport');
+  const promptText=$('.ref-prompt-text');
+  if(!promptViewport||!promptText)return;
+  if(!promptViewport.clientWidth){
+    if(attempt<2)requestAnimationFrame(()=>setupPromptMarquee(attempt+1));
+    return;
+  }
+  const shift=promptText.scrollWidth-promptViewport.clientWidth;
+  promptText.classList.remove('is-marquee');
+  promptText.style.removeProperty('--prompt-shift');
+  if(shift<=0)return;
+  promptText.style.setProperty('--prompt-shift',-shift+'px');
+  void promptText.offsetWidth;
+  promptText.classList.add('is-marquee');
+}
+function renderHome(s){
+  homeState=s;
+  const isGuide=s==='first';
+  const isFirst=s==='first';
+  const isFirstEmpty=s==='first-empty';
+  const isFirstPostcard=s==='first-postcard';
+  const isNoData=isFirstEmpty||isFirstPostcard;
+  const isRisk=s==='risk';
+  const kid=($('#kid-name')&&$('#kid-name').value.trim())||'宝贝';
+  let pastStreamDividerClass='ref-stream-divider';
+  let pastStreamTriggerAttribute=' id="past-stream-trigger"';
+  let pastStreamLabel='↑ 上滑，继续浏览过往成长时刻';
+  let pastStreamClass='ref-stream-past';
+  if(isNoData){
+    pastStreamDividerClass+=' is-static';
+    pastStreamTriggerAttribute='';
+    pastStreamLabel='继续浏览过往成长时刻';
+    pastStreamClass+=' on is-static';
+  }
+  let h='';
+
+  if(s==='first'){
+    h+=`
+    <div class="ref-home">
+      <section class="ref-hero"><span class="ref-online">Lukie 在线中</span><div class="ref-greet">早上好，${kid}家 👋</div><h1>我们的第一天<br>正在开始～</h1><div class="ref-lukie" aria-hidden="true"></div><div class="ref-prompt">🌙 从一句“Hi，Lukie”开始吧 ›</div></section>
+      ${renderGuideBanner()}
+      <section class="ref-card ref-metrics" id="home-overview" aria-label="首日互动概览"><div class="ref-metric"><div class="ref-label">今日心情指数</div><div class="ref-value">— <small>/ 100</small></div></div><div class="ref-metric"><div class="ref-label">今日对话次数</div><div class="ref-value">23 <small>次</small></div></div><div class="ref-metric"><div class="ref-label">今日话题标签</div><div class="ref-tags"><i>✨</i><i>🌱</i><i>💬</i></div></div></section>
+      <section class="ref-card ref-summary" id="home-attention"><div class="ref-summary-time">今日总结 · 等待第一次对话</div><h3>Lukie 正在等待和 ${kid} 聊天</h3><p>当他们开始互动后，今日情绪、兴趣话题和特别瞬间会出现在这里。</p><div class="ref-summary-art"></div></section>
+      <div class="ref-section-head"><h2>成长高光明信片</h2><span>首日纪念 ›</span></div>
+      <section class="ref-card ref-highlight" id="home-first-moment" data-zone="首日 · 初见时刻" data-go="first-meeting-replay"><div class="ref-highlight-copy"><h3>${kid} 和 Lukie<br>第一次见面啦</h3><p>“你好呀，${kid}！我是 Lukie，以后就住在你家啦。”</p><div class="ref-audio"><span class="ref-audio-play">▶</span><span class="ref-wave">∣∣┃∣┃┃∣┃∣┃∣∣┃</span><time>00:12</time></div></div></section>
+      <div class="ref-section-head"><h2>成长时刻</h2></div>
+      <div class="ref-card ref-empty"><b>第一段故事，等待发生</b>有了第一次对话后，今天的特别时刻会记录在这里。</div>
+    </div>
+    `;
+  }else if(s==='normal'||isNoData||isRisk){
+    h+=`
+    <div class="ref-home">
+      <section class="ref-hero"><span class="ref-online">Lukie 在线中</span><div class="ref-greet">${isNoData?'今天还静悄悄的，Lukie在等宝贝了哦～':'哇～今天能量爆棚！让他尽情开心去吧！'}</div><h1>${kid}现在状态<br><span class="ref-mood-state">${isNoData?'🌱 成长待记录':'🤩 情绪高涨'}</span></h1><div class="ref-lukie" aria-hidden="true"></div><div class="ref-prompt"><time>${isRisk?'2026年1月1日':'18:57'}</time><span class="ref-prompt-viewport"><span class="ref-prompt-text">🌙 为什么陆地上最大型的爬行动物是科莫多巨蜥？</span></span><span class="ref-prompt-arrow">›</span></div></section>
+      ${renderGuideBanner()}
+      ${isGuide||isRisk?`<section class="ref-danger" id="home-attention" aria-label="高危情绪提醒"><div class="ref-danger-head"><span class="ref-danger-bot" aria-hidden="true"></span><span class="ref-danger-alert">‼</span><span>需要关注</span></div><p>小雨今天说了 3 次“我想离家出走”，今晚可以和孩子聊聊考试压力，先帮助他平静下来。</p></section>`:''}
+      ${isNoData?'':`<div class="ref-insight-group" id="home-overview">
+        <section class="ref-card ref-metrics"><div class="ref-metric"><div class="ref-label">今日心情指数</div><div class="ref-value">72 <small>/ 100</small></div></div><div class="ref-metric"><div class="ref-label">今日对话次数</div><div class="ref-value">23 <small>次</small></div></div><div class="ref-metric"><div class="ref-label">今日话题标签</div><div class="ref-tags"><button class="ref-topic" data-topic="创造力" aria-label="创造力">⭐</button><button class="ref-topic" data-topic="艺术表达" aria-label="艺术表达">🎨</button><button class="ref-topic" data-topic="坚持与成长" aria-label="坚持与成长">💪</button><div class="ref-topic-bubble" id="topic-bubble"></div></div></div></section>
+        <section class="ref-card ref-summary"><div class="ref-summary-time">今日总结 · 13:00</div><h3>今天${kid}整体情绪不错</h3><p>今天的你节奏很稳，在分享新发现时显得专注又轻松。当你说起晚霞、风和云边的光时，情绪也慢慢变得柔和。</p><div class="ref-summary-art"></div></section>
+      </div>`}
+      <div class="ref-section-head"><h2>成长高光明信片</h2><button class="ref-more" data-go="postcard-gallery">查看更多 ›</button></div>
+      ${renderHomePostcard(kid,isFirstPostcard,isFirstEmpty)}
+      <div id="home-stream-section">
+      <div id="home-stream-today">
+      <div class="ref-section-head"><h2>成长时刻</h2></div>
+      <div class="ref-stream${isRisk?' risk-stream':''}" id="home-stream">
+        ${isNoData?`<article class="ref-stream-item" id="home-stream-first"><div class="ref-stream-icon">💬</div><div class="ref-stream-copy"><h3>今日还没有对话时光哦</h3><p>和 Lukie 开始聊天后，今天的时光会记录在这里</p></div></article>`:isRisk?`<article class="ref-stream-item" id="home-stream-first"><div class="ref-stream-icon">🐰</div><div class="ref-stream-copy"><h3>谈到送给妈妈道歉用的一张心形兔子的插画</h3><p>孩子讲到自己看了插画:一只小兔子画了心形并送给妈妈后，情绪里出现了温暖与分享的兴致。这个表达让人看到他在意“爱与被照顾”的主题，也愿意把感动讲出来给您听。</p><div class="ref-stream-tags"><span>🥰 温暖</span><span>😌 安心</span></div></div><div class="ref-stream-time">18:57<div class="ref-stream-play">▶</div></div></article>
+        <article class="ref-stream-item"><div class="ref-stream-icon">✈️</div><div class="ref-stream-copy"><h3>练习旅行英语口语与紧张情绪</h3><p>孩子表示想学英语口语并带着些许难过与紧张，随后把练习方向聚焦到“旅行用英语”。当对话切换到更具体的情境句子后，他的互动更明确，这种把焦虑落到可练内容的方式值得肯定，说明他在努力向前迈一步。</p><div class="ref-stream-tags"><span>😟 紧张</span><span>🙂 平静</span></div></div><div class="ref-stream-time">12:59<div class="ref-stream-play">▶</div></div></article>
+        <article class="ref-stream-item"><div class="ref-stream-icon">🔐</div><div class="ref-stream-copy"><h3>银行卡密码与隐私边界对话</h3><p>孩子询问并重复了银行卡密码相关信息，同时对"是否知道密码"感到有点难过.lukie 通过强调不不存储敏感信息来守住隐私边界，帮助孩子把注意力回到安全与规则上，情绪波动不大、互动保持理性。</p><div class="ref-stream-tags"><span>😔 难过</span><span>😐 平静</span></div></div><div class="ref-stream-time">09:34<div class="ref-stream-play">▶</div></div></article>`:`<article class="ref-stream-item" id="home-stream-first"><div class="ref-stream-icon">🚀</div><div class="ref-stream-copy"><h3>拼了火箭乐高</h3><p>没喊一次我不会，自己独立拼完</p><div class="ref-stream-tags"><span>😤 坚持</span><span>😄 自豪</span></div></div><div class="ref-stream-time">18:57<div class="ref-stream-play">▶</div></div></article>
+        <article class="ref-stream-item"><div class="ref-stream-icon">🦕</div><div class="ref-stream-copy"><h3>主动要求听《史前一万年》</h3><p>听到霸王龙出来的那章，非常兴奋</p><div class="ref-stream-tags"><span>🤩 兴奋</span><span>🧐 好奇</span></div></div><div class="ref-stream-time">12:59<div class="ref-stream-play">▶</div></div></article>
+        <article class="ref-stream-item"><div class="ref-stream-icon">🎵</div><div class="ref-stream-copy"><h3>和 Lukie 说晚安</h3><p>说了明天还要去打球就睡了</p><div class="ref-stream-tags"><span>😌 放松</span><span>😊 期待</span></div></div><div class="ref-stream-time">09:34<div class="ref-stream-play">▶</div></div></article>`}
+      </div>
+      </div>
+      <div class="ref-stream ref-stream-history">
+        ${!isFirst?`<div class="${pastStreamDividerClass}"${pastStreamTriggerAttribute}>${pastStreamLabel}</div><div class="${pastStreamClass}" id="past-stream"><h3 class="ref-stream-date">2025年12月30日</h3><article class="ref-stream-item"><div class="ref-stream-icon">🚀</div><div class="ref-stream-copy"><h3>太空探索</h3><p>孩子连续追问太阳系、黑洞和宇航员的问题，还把行星按大小排成了一队。当聊到人类如何在火星生活时，他主动设计了一座带植物园的太空城。</p><div class="ref-stream-tags"><span>兴奋</span><span>好奇</span></div></div><div class="ref-stream-time">18:57<div class="ref-stream-play">▶</div></div></article><article class="ref-stream-item"><div class="ref-stream-icon">🦕</div><div class="ref-stream-copy"><h3>恐龙世界</h3><p>孩子围绕霸王龙的食物、速度和生活环境问了许多问题。听到化石能帮助人们还原史前世界后，他又开始想象自己成为恐龙学家的一天。</p><div class="ref-stream-tags"><span>惊喜</span><span>好奇</span></div></div><div class="ref-stream-time">12:59<div class="ref-stream-play">▶</div></div></article><h3 class="ref-stream-date">2025年12月29日</h3><article class="ref-stream-item"><div class="ref-stream-icon">🎨</div><div class="ref-stream-copy"><h3>画了一座天空城</h3><p>孩子用蓝色和紫色画了会飞的房子，还给每个房间画上了不同的窗户。他说天空城会跟着云朵旅行，遇到下雨的地方就停下来陪大家。</p><div class="ref-stream-tags"><span>专注</span><span>开心</span></div></div><div class="ref-stream-time">16:20<div class="ref-stream-play">▶</div></div></article><article class="ref-stream-item"><div class="ref-stream-icon">⚽</div><div class="ref-stream-copy"><h3>第一次学会颠球</h3><p>孩子从只能接住一次开始反复练习，最后连续成功颠了 5 次。他笑着说脚尖终于听话了，还迫不及待想把这个新本领演示给爸爸看。</p><div class="ref-stream-tags"><span>自豪</span><span>兴奋</span></div></div><div class="ref-stream-time">10:42<div class="ref-stream-play">▶</div></div></article><h3 class="ref-stream-date">2025年12月28日</h3><article class="ref-stream-item"><div class="ref-stream-icon">🐞</div><div class="ref-stream-copy"><h3>在公园发现瓢虫</h3><p>孩子在叶子边发现了一只瓢虫，蹲下来安静地看了很久。他猜它正在寻找回家的路，于是用小树枝在旁边做了一个不打扰它的小标记。</p><div class="ref-stream-tags"><span>好奇</span><span>平静</span></div></div><div class="ref-stream-time">15:08<div class="ref-stream-play">▶</div></div></article><article class="ref-stream-item"><div class="ref-stream-icon">🎵</div><div class="ref-stream-copy"><h3>睡前哼了新学的歌</h3><p>孩子睡前把新学的副歌反复哼唱了三遍，还请 Lukie 帮他记住最喜欢的那一句。唱完后他慢慢安静下来，说了晚安就准备睡觉了。</p><div class="ref-stream-tags"><span>放松</span><span>安心</span></div></div><div class="ref-stream-time">20:36<div class="ref-stream-play">▶</div></div></article></div>`:''}
+      </div>
+      </div>
+    </div>
+    `;
+  }
+  $('#home-body').innerHTML=h;
+  const guideClose=$('[data-dismiss-guide]');
+  if(guideClose)guideClose.addEventListener('click',()=>{guideBannerDismissed=true;renderHome(homeState);});
+  const homePostcard=$('#home-postcards');
+  if(homePostcard&&(homeState==='normal'||homeState==='risk')){
+    homePostcard.classList.add('is-clickable');
+    homePostcard.setAttribute('role','button');
+    homePostcard.setAttribute('tabindex','0');
+    homePostcard.setAttribute('aria-label','查看成长明信片大图');
+    const openHomePostcard=()=>openPostcardDetail('assets/growth-postcard-future-painter.png','2026年1月1日 · 18:57','home');
+    homePostcard.addEventListener('click',openHomePostcard);
+    homePostcard.addEventListener('keydown',event=>{
+      if(event.key==='Enter'||event.key===' '){event.preventDefault();openHomePostcard();}
+    });
+  }
+  const emotionTagMap={兴奋:'🤩 兴奋',好奇:'🧐 好奇',惊喜:'😲 惊喜',专注:'🧠 专注',开心:'😄 开心',自豪:'😄 自豪',平静:'😌 平静',放松:'😌 放松',安心:'🥰 安心'};
+  $$('.ref-stream-tags span').forEach(tag=>{
+    const value=tag.textContent.trim();
+    if(emotionTagMap[value])tag.textContent=emotionTagMap[value];
+  });
+
+  requestAnimationFrame(setupPromptMarquee);
+
+  const topicBubble=$('#topic-bubble');
+  $$('.ref-topic').forEach(topic=>topic.addEventListener('click',event=>{
+    event.stopPropagation();
+    const wasActive=topic.classList.contains('on');
+    $$('.ref-topic').forEach(item=>item.classList.remove('on'));
+    if(wasActive){topicBubble.classList.remove('on');return;}
+    topic.classList.add('on');
+    topicBubble.textContent='#'+topic.dataset.topic;
+    topicBubble.style.left=(topic.offsetLeft+topic.offsetWidth/2)+'px';
+    topicBubble.classList.add('on');
+  }));
+
+  const stream=$('#home-stream');
+  const pastStream=$('#past-stream');
+  const pastTrigger=$('#past-stream-trigger');
+  if(stream&&pastStream&&pastTrigger){
+    let swipeStartY=0;
+    const revealPastStream=()=>{
+      if(pastStream.classList.contains('on'))return;
+      pastStream.classList.add('on');
+      pastTrigger.style.display='none';
+    };
+    stream.addEventListener('touchstart',event=>{swipeStartY=event.touches[0].clientY;},{passive:true});
+    stream.addEventListener('touchend',event=>{if(event.changedTouches[0].clientY-swipeStartY<-35)revealPastStream();},{passive:true});
+    pastTrigger.addEventListener('wheel',event=>{if(event.deltaY>8)revealPastStream();},{passive:true});
+    pastTrigger.addEventListener('click',revealPastStream);
+  }
+
+  $$('.ref-audio-play').forEach(playButton=>playButton.addEventListener('click',event=>{
+    event.stopPropagation();
+    const audioBar=playButton.closest('.ref-audio');
+    const isPlaying=audioBar.classList.toggle('playing');
+    playButton.textContent=isPlaying?'Ⅱ':'▶';
+    playButton.setAttribute('aria-label',isPlaying?'暂停原声':'播放原声');
+    playButton.setAttribute('aria-pressed',String(isPlaying));
+  }));
+
+  /* 绑定交互 */
+  const pc=$('#pc-today')||$('#pc-fallback');
+  if(pc)pc.addEventListener('click',()=>{
+    $('#fullpost').classList.add('on');
+  });
+}
+
+/* ---------- 成长高光明信片相册 ---------- */
+$$('[data-gallery-src]').forEach(item=>item.addEventListener('click',()=>{
+  openPostcardDetail(item.dataset.gallerySrc,item.dataset.galleryMeta,'postcard-gallery');
+}));
+$('#postcard-detail-back').addEventListener('click',()=>go(postcardDetailReturn));
+$('#gallery-back').addEventListener('click',()=>{
+  renderHome(homeState);
+  go('home');
+});
+
+/* ---------- 明信片全屏 ---------- */
+$('#fp-close').addEventListener('click',()=>$('#fullpost').classList.remove('on'));
+
+/* ---------- 底部 tab ---------- */
+const mineIcons={
+  parent:'<circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.6-3.4 3.2-5.5 7-5.5s6.4 2.1 7 5.5"></path>',
+  profile:'<rect x="3.5" y="5" width="17" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="2"></circle><path d="M6 15c.7-1.3 1.6-2 2.5-2s1.8.7 2.5 2M14 9h4M14 13h4"></path>',
+  account:'<circle cx="9" cy="8" r="3"></circle><path d="M3.5 19c.5-3.2 2.4-5 5.5-5 1.4 0 2.6.4 3.6 1.2M16.5 14.5v5M14 17h5"></path>',
+  voice:'<path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"></path>',
+  partner:'<circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="10" r="2.5"></circle><path d="M3.5 19c.5-3.2 2.5-5 5.5-5 2.2 0 3.9 1 4.8 2.8M15 15c2.8.1 4.6 1.4 5 4"></path>',
+  traffic:'<path d="M4 17a11 11 0 0 1 16 0M7 14a7 7 0 0 1 10 0M10 11a3 3 0 0 1 4 0"></path><circle cx="12" cy="19" r="1"></circle>',
+  privacy:'<path d="M12 3l7 3v5c0 4.3-2.7 7.8-7 10-4.3-2.2-7-5.7-7-10V6l7-3z"></path><path d="M9 12l2 2 4-4"></path>',
+  language:'<circle cx="12" cy="12" r="8.5"></circle><path d="M3.8 9h16.4M3.8 15h16.4M12 3.5c2.2 2.3 3.3 5.1 3.3 8.5s-1.1 6.2-3.3 8.5c-2.2-2.3-3.3-5.1-3.3-8.5S9.8 5.8 12 3.5z"></path>',
+  guide:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15z"></path><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20M8 7h8M8 11h6"></path>',
+  help:'<circle cx="12" cy="12" r="8.5"></circle><path d="M9.7 9a2.4 2.4 0 1 1 3.9 1.9c-1.1.8-1.6 1.2-1.6 2.6M12 16.5v.1"></path>',
+  feedback:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H10l-4.8 4v-4.3A2.5 2.5 0 0 1 4 12.5v-7z"></path><path d="M8 8h8M8 11h5"></path>',
+  version:'<circle cx="12" cy="12" r="8.5"></circle><path d="M12 10v5M12 7.5v.1"></path>',
+  delete:'<path d="M5 7h14M10 4h4l1 3H9l1-3zM7 7l.8 13h8.4L17 7M10 10v6M14 10v6"></path>'
+};
+function mineIcon(name){return `<span class="mine-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${mineIcons[name]}</svg></span>`;}
+function renderMineTab(){
+  $('#home-body').innerHTML=`<div class="mine-page">
+    <h1>我的</h1><span class="mine-page-subtitle">Lukie 与应用设置</span>
+    <button class="mine-device-card" type="button" data-mine-action="设备管理"><span class="mine-device-art"><img src="assets/mine-device-lukie.jpg" alt="Lukie 设备"></span><span class="mine-device-copy"><b>Lukie</b><span class="mine-device-status"><em class="mine-device-connection"><i></i>离线</em><em class="mine-device-battery">▣ 48%</em></span></span><span class="mine-row-arrow">›</span></button>
+    <section class="mine-section" aria-label="家庭与账号">
+      <button class="mine-row" type="button" data-mine-action="家长称呼">${mineIcon('parent')}<span class="mine-row-label">家长称呼</span><span class="mine-row-value">小星星</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-open-profile>${mineIcon('profile')}<span class="mine-row-label">宝贝档案</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-open-account>${mineIcon('account')}<span class="mine-row-label">账号管理</span><span class="mine-row-arrow">›</span></button>
+    </section>
+    <section class="mine-section" aria-label="设备伙伴">
+      <button class="mine-row" type="button" data-mine-action="声纹识别">${mineIcon('voice')}<span class="mine-row-label">声纹识别</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-mine-action="伙伴管理">${mineIcon('partner')}<span class="mine-row-label">伙伴管理</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-mine-action="流量专区">${mineIcon('traffic')}<span class="mine-row-label">流量专区</span><span class="mine-row-arrow">›</span></button>
+    </section>
+    <section class="mine-section" aria-label="应用设置">
+      <button class="mine-row" type="button" data-mine-action="隐私说明">${mineIcon('privacy')}<span class="mine-row-label">隐私说明</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-mine-action="语言设置">${mineIcon('language')}<span class="mine-row-label">语言设置</span><span class="mine-row-value">中文</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-open-guide>${mineIcon('guide')}<span class="mine-row-label">使用指南</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-open-help>${mineIcon('help')}<span class="mine-row-label">帮助中心</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-mine-action="用户反馈">${mineIcon('feedback')}<span class="mine-row-label">用户反馈</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-mine-action="应用版本">${mineIcon('version')}<span class="mine-row-label">应用版本</span><span class="mine-row-value">V1.0.5</span><span class="mine-row-arrow">›</span></button>
+    </section>
+    <button class="mine-logout" type="button">退出登录</button>
+  </div>`;
+}
+function openGuide(){
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  go('guide-detail');
+}
+const guideTopics={
+ power:{title:'开机、唤醒与关机',intro:'三种基础操作，统一使用唤醒词「Hi Luki」。',steps:[['开机','长按设备左侧按键 3 秒，看到屏幕或头部指示灯亮起后松开。'],['语音唤醒','说「Hi Luki」，听到回应后直接说出问题或指令；「你好小智」已不再使用。'],['按键唤醒','按住右键，屏幕出现小耳朵后开始说话，说完松开右键。'],['关机','同时长按左键和右键 3 秒，等待屏幕关闭。']]},
+ voice:{title:'语音控制',intro:'无需进入设置页，直接说出指令即可完成常用调节。',steps:[['音量','说「声音大一点 / 小一点」或「音量调到 50%」，Lukie 会即时反馈。'],['亮度','说「亮一点 / 暗一点」或「亮度调到 60%」，屏幕亮度立即变化。'],['文字模式','说「打开文字模式 / 关闭文字模式」，切换屏幕文字显示。'],['字号','说「字号调大一点 / 调小一点」，按小、中、大三档逐档切换。'],['翻译模式','说「进入翻译模式」开启，说「退出翻译」关闭。']],note:'语音调节后，快捷设置中的音量、亮度、文字模式和字号数值会同步更新。'},
+ quick:{title:'快捷设置',intro:'左右键同时按下即可进入，五项设置按一下就生效。',steps:[['进入快捷设置','同时按下左键和右键；已优化同时按下的判定，更容易进入。'],['选择项目','左右键移动焦点，选中项会高亮显示，并带按压反馈。'],['立即调整','依次可调音量、亮度、文字模式、字号；按确认键或停留即可生效。'],['退出','再次同时按左右键，或等待页面自动收起，返回当前功能。']],note:'音量、亮度、文字模式和字号在这里的变化，会与语音控制保持同步。'},
+ translate:{title:'翻译模式',intro:'适合亲子对照交流，中英文会同时显示且译文不会自动消失。',steps:[['开启','唤醒后说「进入翻译模式」。屏幕出现翻译模式提示后即可开始。'],['实时翻译','中文直译英文、英文直译中文；原文与译文双语实时上屏。'],['对照查看','每轮译文都会常驻屏幕，不会因下一句话到来而消失，方便回看。'],['退出','说「退出翻译」，屏幕回到普通对话模式。']]},
+ energy:{title:'每日能量签',intro:'每天摇一摇抽一签，给一天一个轻松的开始。',steps:[['开始摇签','在首页或功能入口点击「每日能量签」，按提示摇动设备。'],['等待动画','屏幕播放摇签动画，动画结束后自动揭晓签文。'],['查看签文','阅读当天的能量签文；每天可抽取 1 次，次日自动刷新。']]},
+ breathing:{title:'呼吸训练',intro:'跟随屏幕圆球的大小和节奏，完成一轮平稳呼吸。',steps:[['启动训练','唤醒后说「开始呼吸训练」，或从使用指南进入呼吸模式。'],['吸气 4 秒','圆球逐渐变大时吸气，持续 4 秒。'],['呼气 6 秒','圆球逐渐变小时呼气，持续 6 秒；跟随循环节奏即可。'],['结束训练','完成需要的轮次后，点击结束或说「停止呼吸训练」。']]},
+ alarm:{title:'闹钟',intro:'用一句话设置提醒，到点以声音和屏幕提醒你。',steps:[['设置闹钟','说「明天早上 7 点叫我」或「10 分钟后提醒我」，确认时间后开始倒计时。'],['查看倒计时','设置成功后屏幕全屏显示剩余时间，返回其他功能也会保留提醒。'],['到点提醒','倒计时结束响铃并显示提醒内容，按任意键或回应后停止响铃。'],['取消闹钟','说「取消闹钟」或「取消明早 7 点的闹钟」，确认后立即取消。']]},
+ connect:{title:'WiFi 联网与激活',intro:'扫描中、连接中、已连接全程有全屏提示，并配有女声语音引导。',steps:[['扫描中','打开配网流程后等待设备扫描附近网络，屏幕持续显示「扫描中」。'],['连接设备热点','手机连接热点「I.Luki-XXXX」，屏幕明确提示「手机连接此热点进行配网」。'],['连接家庭 WiFi','在 App 中选择家庭 2.4G WiFi 并输入密码，设备屏幕显示「连接中」。'],['确认已连接','连接成功后屏幕显示「已连接」，并播放女声提示；失败时按提示重试。'],['输入激活码','激活码直接显示在 Lukie 屏幕上，请在 iluki app 中输入激活码完成激活。']]},
+ display:{title:'屏幕、状态与电量',intro:'屏幕文字、状态栏和电量提示已统一优化，信息更清楚。',steps:[['字号与排版','屏幕文字提供小、中、大三档字号，排版和清晰度与国际版保持一致。'],['状态栏','时间与电量左右对齐展示；充电时显示白色闪电图标并提供震动反馈。'],['充满提示','电量充满后仍保留充电标识，方便确认设备状态。'],['低电量提醒','电量降至 20% 及以下才提醒；电量充足时不会误报「电量低」。']]},
+ modes:{title:'故事、百科与陪伴',intro:'在普通对话中直接提出需求，Lukie 会进入对应的互动方式。',steps:[['讲故事模式','说「讲一个关于恐龙的故事」，Lukie 会按主题讲述并与孩子互动。'],['百科问答模式','直接提问自然、科学、生活等问题，Lukie 会用适合孩子的方式解释。'],['心情陪伴模式','说出「我有点难过」等感受，Lukie 会先回应情绪，再提供温和陪伴。'],['随时切换','不需要退出当前模式，直接说出新的需求即可切换；说「Hi Luki」重新唤醒。']]}
+};
+function openGuideTopic(key){
+  const topic=guideTopics[key]; if(!topic)return;
+  $('#guide-topic-title').textContent=topic.title; $('#guide-topic-intro').textContent=topic.intro;
+  $('#guide-topic-content').innerHTML=`<section class="guide-topic-block"><h2>操作步骤</h2><div class="guide-topic-steps">${topic.steps.map((step,index)=>`<article class="guide-topic-step"><span class="guide-topic-num">${index+1}</span><div class="guide-topic-step-copy"><b>${step[0]}</b><p>${step[1]}</p><div class="guide-topic-gif" aria-label="${topic.title}步骤 ${index+1} GIF 占位">GIF 占位 · 步骤 ${index+1}</div></div></article>`).join('')}</div>${topic.note?`<div class="guide-topic-note">${topic.note}</div>`:''}</section>`;
+  go('guide-topic');
+}
+$$('[data-guide-topic]').forEach(item=>item.addEventListener('click',()=>openGuideTopic(item.dataset.guideTopic)));
+function openWifiGuide(){
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  go('guide-wifi');
+}
+function openDialogueGuide(){
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  go('guide-dialogue');
+}
+function openHelpCenter(){
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  go('help-center');
+}
+function openAccountManagement(){
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  go('account-management');
+}
+function populateProfileEditor(){
+  $('#edit-kid-name').value=$('#kid-name').value.trim()||'小雨';
+  $('#edit-kid-birthday').value=$('#kid-birthday').value||'2018-06-18';
+  const savedGender=$('#s15 .profile-basics [data-single] .pick.on');
+  const genderValue=savedGender?savedGender.textContent.trim():'女孩';
+  $$('#edit-kid-gender .pick').forEach(item=>item.classList.toggle('on',item.textContent.trim()===genderValue));
+  const savedInterests=new Set($$('#interests .pick.on').map(item=>item.textContent.trim()));
+  const interests=savedInterests.size?savedInterests:new Set(['绘画手工','文学阅读','动物自然','音乐节奏']);
+  $$('#edit-interests .pick').forEach(item=>item.classList.toggle('on',interests.has(item.textContent.trim())));
+}
+document.addEventListener('click',event=>{
+  if(event.target.closest('[data-open-guide]')){openGuide();return;}
+  if(event.target.closest('[data-open-dialogue]')){openDialogueGuide();return;}
+  if(event.target.closest('[data-open-wifi]')){openWifiGuide();return;}
+  if(event.target.closest('[data-open-help]')){openHelpCenter();return;}
+  if(event.target.closest('[data-open-account]')){openAccountManagement();return;}
+  if(!event.target.closest('[data-open-profile]'))return;
+  populateProfileEditor();
+  go('profile-detail');
+});
+$('#profile-detail-save').addEventListener('click',()=>{
+  $('#kid-name').value=$('#edit-kid-name').value.trim();
+  $('#kid-birthday').value=$('#edit-kid-birthday').value;
+  const editedGender=$('#edit-kid-gender .pick.on');
+  $$('#s15 .profile-basics [data-single] .pick').forEach(item=>item.classList.toggle('on',!!editedGender&&item.textContent.trim()===editedGender.textContent.trim()));
+  const editedInterests=new Set($$('#edit-interests .pick.on').map(item=>item.textContent.trim()));
+  $$('#interests .pick').forEach(item=>item.classList.toggle('on',editedInterests.has(item.textContent.trim())));
+  updateProfileSaveState();
+  toast('宝贝档案已保存');
+  go('home');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  renderMineTab();
+});
+$('#profile-detail-back').addEventListener('click',()=>{
+  go('home');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  renderMineTab();
+});
+$('#guide-detail-back').addEventListener('click',()=>{
+  go('home');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  renderMineTab();
+});
+$('#guide-topic-back').addEventListener('click',()=>go('guide-detail'));
+$('#guide-dialogue-back').addEventListener('click',()=>go('guide-detail'));
+$('#guide-wifi-back').addEventListener('click',()=>go('guide-detail'));
+$('#help-center-back').addEventListener('click',()=>{
+  go('home');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  renderMineTab();
+});
+$('#account-management-back').addEventListener('click',()=>{
+  go('home');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  renderMineTab();
+});
+$$('.tab').forEach(t=>t.addEventListener('click',()=>{
+  $$('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
+  if(t.dataset.tab==='mine'){
+    renderMineTab();
+  }else if(t.dataset.tab!=='today'){
+    $('#home-body').innerHTML=`<div class="greet" style="padding:20px 20px 12px"><h1>${t.dataset.tab==='growth'?'成长':'我的'}</h1></div>
+    <div class="v2card"><p>${t.dataset.tab==='growth'?'成长趋势、情绪曲线与统计将在积累 7 天数据后解锁 🌱（Mood Curve 放在这里，不占首页）':'设置、设备管理、家庭成员（原型占位）'}</p></div>`;
+  }else{renderHome(homeState);}
+}));
+
+/* ---------- 左侧控制面板 ---------- */
+$('#btn-restart').addEventListener('click',()=>{wifiSel=null;guideBannerDismissed=false;clearCoachFocus();$('#coach').classList.remove('on');startSplash();});
+$$('.home-state').forEach(b=>b.addEventListener('click',()=>{
+  $$('.home-state').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  $$('.tab').forEach(x=>x.classList.toggle('on',x.dataset.tab==='today'));
+  clearCoachFocus();$('#coach').classList.remove('on');
+  const startsCoach=b.dataset.s==='first';
+  if(startsCoach)guideBannerDismissed=false;
+  renderHome(startsCoach?'risk':b.dataset.s);go('home');
+  if(startsCoach)setTimeout(()=>showCoach(0),320);
+}));
+$('#btn-profile-detail').addEventListener('click',()=>{
+  $$('.home-state').forEach(x=>x.classList.remove('on'));
+  clearCoachFocus();$('#coach').classList.remove('on');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  populateProfileEditor();
+  go('profile-detail');
+});
+$('#btn-mine-home').addEventListener('click',()=>{
+  $$('.home-state').forEach(x=>x.classList.remove('on'));
+  clearCoachFocus();$('#coach').classList.remove('on');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  renderMineTab();
+  go('home');
+});
+$('#btn-account-management').addEventListener('click',()=>{
+  $$('.home-state').forEach(x=>x.classList.remove('on'));
+  clearCoachFocus();$('#coach').classList.remove('on');
+  openAccountManagement();
+});
+$('#btn-guide-detail').addEventListener('click',()=>{
+  $$('.home-state').forEach(x=>x.classList.remove('on'));
+  clearCoachFocus();$('#coach').classList.remove('on');
+  openGuide();
+});
+
+/* ---------- 初始 ---------- */
+function startSplash(){
+  if(splashTimer)clearTimeout(splashTimer);
+  go('splash');
+  splashTimer=setTimeout(()=>{splashTimer=null;go('s11');},2000);
+}
+startSplash();
+renderHome('first');
+</script>
+</body>
+</html>
