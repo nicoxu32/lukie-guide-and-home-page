@@ -6,6 +6,7 @@
 <title>Lukie 交互原型 · 首次引导 + 首页状态机</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+:root{--home-background:linear-gradient(120deg,rgba(137,159,245,.78) 0%,rgba(188,177,241,.68) 24%,rgba(242,188,211,.7) 48%,rgba(238,211,237,.34) 66%,transparent 84%),linear-gradient(180deg,#ded8ff 0%,#e8e3ff 34%,#efebff 68%,#f3efff 100%);--gallery-background:radial-gradient(circle at 75% 8%,#f7cfff 0,transparent 25%),linear-gradient(155deg,#e4e1ff 0%,#f8efff 52%,#eceaff 100%)}
 body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;background:#f2f1ec;min-height:100vh;display:flex;gap:32px;align-items:flex-start;justify-content:center;padding:32px 24px;color:#222}
 .panel{width:230px;flex:none;position:sticky;top:32px}
 .panel h2{font-size:15px;font-weight:600;margin-bottom:12px}
@@ -18,6 +19,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .statusbar{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:14px;font-weight:600;background:transparent;position:relative;z-index:5}
 .scr{position:absolute;inset:0;padding-top:44px;display:none;flex-direction:column;background:#faf8f4;animation:fadein .35s}
 .scr.on{display:flex}
+#home,#postcard-gallery,#postcard-detail{padding-top:0;background:transparent}
 .splash-screen{z-index:7;padding:0;background:#eee9ff;animation:none}
 .splash-screen img{display:block;width:100%;height:100%;object-fit:cover}
 @keyframes fadein{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
@@ -179,8 +181,8 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 @keyframes spin{to{transform:rotate(360deg)}}
 .errbox{background:#fdeeee;border-radius:12px;padding:12px 14px;font-size:13px;color:#b3402e;line-height:1.6;margin:12px 0;display:none}
 .errbox.on{display:block;animation:fadein .3s}
-.home-scroll{flex:1;overflow-y:auto;padding:0 0 90px;background:#f6f4fb}
-#home{background:#f6f4fb}
+.home-scroll{flex:1;overflow-y:auto;padding:0 0 90px;background:transparent}
+#home{background:transparent}
 .greet{padding:6px 4px 12px}
 .greet .date{font-size:12px;color:#a09a90}
 .greet h1{font-size:24px;font-weight:700;margin-top:2px}
@@ -378,17 +380,21 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .leftoff{background:#f6f3ff;border-radius:14px;padding:12px 14px;font-size:13px;color:#4a4460;line-height:1.6;border-left:3px solid #7b5cd6;margin-top:8px}
 .annot .v2card,.annot .sky{outline:2px dashed rgba(240,145,60,.7);outline-offset:2px}
 .annot .sky{position:relative}
-.ref-home{min-height:100%;padding:14px 14px 28px;background:linear-gradient(155deg,#e8e9ff 0%,#f8e8f1 28%,#eeebff 58%,#f3efff 100%);color:#19182f}
-.ref-hero{position:relative;min-height:208px;padding:8px 8px 12px}
-.ref-online{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:15px;background:#e7f9e8;color:#20b84b;font-size:11px;font-weight:700}
-.ref-online::before{content:"";width:8px;height:8px;border-radius:50%;background:#2dc653}
-.ref-greet{max-width:220px;margin-top:13px;font-size:12px;font-weight:650;line-height:1.5;color:#77738d}
-.ref-hero h1{max-width:220px;margin-top:8px;font-size:27px;line-height:1.2;letter-spacing:-.6px;color:#1d1b3a}
+.ref-home{min-height:100%;padding:58px 14px 28px;background-color:#f3efff;background-image:var(--home-background);background-repeat:no-repeat;background-size:100% 1318px;color:#19182f}
+/* 首页情绪头部：使用参考稿中的晨光渐变与轻盈留白 */
+.ref-hero{position:relative;min-height:225px;margin:-14px -14px 2px;padding:24px 28px 14px;overflow:hidden;border-radius:0;background:transparent}
+.ref-hero::before,.ref-hero::after{content:"✦";position:absolute;color:rgba(255,255,255,.92);font-size:28px;text-shadow:27px 20px 0 rgba(255,255,255,.68)}
+.ref-hero::before{right:105px;top:38px}.ref-hero::after{right:28px;top:95px;font-size:15px;transform:rotate(18deg)}
+.ref-online{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:16px;background:rgba(218,255,223,.9);color:#21b84c;font-size:11px;font-weight:800;box-shadow:0 4px 12px rgba(52,188,83,.08)}
+.ref-online::before{content:"⌁";font-size:16px;font-weight:900;line-height:1}
+.ref-greet,.ref-hero-subtitle{position:relative;z-index:1;max-width:205px;margin-top:10px;font-size:12px;font-weight:600;line-height:1.65;color:#756f87}
+.ref-hero-subtitle{max-width:178px;line-height:1.58}
+.ref-hero h1{position:relative;z-index:1;max-width:205px;margin-top:19px;font-size:29px;line-height:1.17;letter-spacing:-.7px;color:#1d1b3a}
 .ref-mood-state{display:inline-flex;align-items:center;margin-top:7px;padding:7px 12px;border-radius:15px;background:linear-gradient(135deg,#ff9b55,#ff6e68);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;font-weight:650;line-height:1.25;letter-spacing:0;box-shadow:0 7px 16px rgba(255,111,91,.24)}
-.ref-lukie{position:absolute;right:6px;top:33px;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 32% 25%,#e8fbff 0%,#94e4ff 42%,#54b9e7 74%,#3a8dc5 100%);border:1px solid rgba(255,255,255,.78);box-shadow:inset -10px -14px 22px rgba(35,126,186,.2),0 14px 28px rgba(90,119,185,.18)}
+.ref-lukie{position:absolute;right:24px;top:38px;width:122px;height:122px;border-radius:50%;background:radial-gradient(circle at 30% 23%,#f5fdff 0%,#b8edff 34%,#6bcaf2 70%,#419dcc 100%);border:1px solid rgba(255,255,255,.82);box-shadow:inset -11px -15px 23px rgba(35,126,186,.18),0 16px 30px rgba(90,119,185,.2)}
 .ref-lukie::before{content:"";position:absolute;left:33px;top:43px;width:7px;height:17px;border-radius:5px;background:#151725;box-shadow:38px 0 0 #151725}
 .ref-lukie::after{content:"";position:absolute;left:45px;top:67px;width:25px;height:10px;border-bottom:5px solid #151725;border-radius:0 0 20px 20px;transform:rotate(-5deg)}
-.ref-prompt{position:absolute;left:8px;bottom:11px;display:flex;align-items:center;gap:7px;width:255px;padding:8px 11px;border-radius:18px;background:rgba(235,230,255,.9);color:#7059e8;font-size:11px;white-space:nowrap;overflow:hidden}
+.ref-prompt{position:absolute;left:28px;bottom:12px;display:flex;align-items:center;gap:7px;width:255px;padding:9px 12px;border-radius:18px;background:rgba(235,230,255,.58);color:#7059e8;font-size:11px;white-space:nowrap;overflow:hidden;box-shadow:0 5px 14px rgba(102,81,192,.04)}
 .ref-prompt time{flex:none;padding-right:7px;border-right:1px solid rgba(112,89,232,.2);font-size:10px;font-weight:700;color:#8c7de1}
 .ref-prompt-viewport{min-width:0;flex:1;overflow:hidden}
 .ref-prompt-text{display:inline-block;min-width:max-content;will-change:transform}
@@ -418,7 +424,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .ref-topic-bubble.on{display:block;animation:fadein .18s ease}
 .ref-topic-bubble::after{content:"";position:absolute;left:50%;bottom:-5px;width:10px;height:10px;background:#28233f;transform:translateX(-50%) rotate(45deg)}
 .ref-summary{position:relative;min-height:128px;padding:17px 104px 17px 17px}
-.ref-summary-time{font-size:11px;color:#918ba4}
+.ref-summary-time{font-size:11px;font-weight:800;color:#918ba4}
 .ref-summary h3{margin:9px 0 5px;font-size:15px;color:#15141d}
 .ref-summary p{font-size:11.5px;line-height:1.55;color:#777187}
 .ref-summary-art{position:absolute;right:18px;top:28px;width:65px;height:72px;border-radius:10px;background:linear-gradient(145deg,#fffdf4,#f3eedc);box-shadow:7px 7px 0 #9c82ef;transform:rotate(7deg)}
@@ -465,22 +471,37 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .risk-stream .ref-stream-item{align-items:start}.risk-stream .ref-stream-copy h3{line-height:1.45}.risk-stream .ref-stream-copy p{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.62}
 .ref-stream-tags{margin-top:6px}.ref-stream-tags span{display:inline-block;margin-right:5px;padding:3px 8px;border-radius:10px;background:#eee9ff;color:#735ce6;font-size:9.5px}
 .ref-stream-time{align-self:start;text-align:right;font-size:10px;color:#aaa4c0}.ref-stream-play{display:flex;align-items:center;justify-content:center;width:31px;height:31px;margin-top:8px;border-radius:50%;background:#eee8ff;color:#171523;font-size:10px}
-.gallery-page{flex:1;overflow-y:auto;padding:14px 14px 34px;background:#f4f1ff}
-.gallery-head{display:flex;align-items:center;gap:12px;padding:5px 2px 18px}
-.gallery-back{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:50%;background:#fff;color:#605a77;font-size:22px;cursor:pointer;box-shadow:0 3px 10px rgba(74,63,139,.08)}
-.gallery-head h1{font-size:22px;color:#17152a}.gallery-sub{margin:-9px 2px 14px;font-size:11px;color:#8f899f}
-.gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
-.gallery-item{position:relative;aspect-ratio:1;border:0;padding:0;overflow:hidden;background:#ddd;cursor:pointer}
-.gallery-item:first-child{border-radius:14px 0 0 0}.gallery-item:nth-child(3){border-radius:0 14px 0 0}
-.gallery-item img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .2s}.gallery-item:active img{transform:scale(.97)}
-.gallery-meta{position:absolute;left:0;right:0;bottom:0;padding:18px 6px 5px;background:linear-gradient(transparent,rgba(16,13,28,.72));color:#fff;font-size:8.5px;line-height:1.25;text-align:left;text-shadow:0 1px 3px rgba(0,0,0,.45)}
-.postcard-detail-page{height:100%;display:flex;flex-direction:column;padding:19px 16px 30px;background:#15141e;color:#fff}
-.postcard-detail-back{align-self:flex-start}
-.postcard-detail-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:14px 0}
-.postcard-detail-stage img{display:block;max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 18px 52px rgba(0,0,0,.42)}
-.postcard-detail-meta{padding-top:13px;color:#fff;font-size:13px;text-align:center;letter-spacing:.2px}
-.mine-page{height:100%;overflow-y:auto;padding:20px 16px 24px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
+/* 成长高光：两列明信片收藏册 */
+.gallery-page{flex:1;overflow-y:auto;padding:58px 16px 34px;background:var(--gallery-background)}
+.gallery-head{position:relative;display:flex;align-items:center;justify-content:center;padding:5px 0 14px}
+.gallery-back{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:0;border-radius:50%;background:rgba(255,255,255,.94);color:#605a77;font-size:22px;cursor:pointer;box-shadow:0 3px 10px rgba(74,63,139,.08)}
+.gallery-head .gallery-back{position:absolute;left:0}.gallery-head h1{font-size:18px;color:#17152a}
+.gallery-hero{position:relative;min-height:145px;margin:0 -2px 17px;padding:22px 150px 20px 12px;overflow:hidden}
+.gallery-hero h2{font-size:21px;line-height:1.28;color:#282342}.gallery-hero p{margin-top:8px;font-size:11px;line-height:1.5;color:#77708c}
+.gallery-mascot{position:absolute;right:35px;top:16px;width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 30% 22%,#effdff,#91ddfa 53%,#58add8);box-shadow:0 12px 22px rgba(80,117,189,.18)}
+.gallery-mascot::before{content:"";position:absolute;left:24px;top:31px;width:5px;height:11px;border-radius:4px;background:#20243e;box-shadow:28px 0 0 #20243e}.gallery-mascot::after{content:"";position:absolute;left:34px;top:51px;width:18px;height:7px;border-bottom:4px solid #20243e;border-radius:0 0 12px 12px}
+.gallery-camera{position:absolute;right:13px;top:81px;width:76px;height:50px;border-radius:12px;background:linear-gradient(145deg,#a889ff,#6e62db);box-shadow:0 9px 17px rgba(90,68,183,.22);transform:rotate(-3deg)}.gallery-camera::before{content:"";position:absolute;left:25px;top:9px;width:27px;height:27px;border:5px solid #e1d9ff;border-radius:50%;background:#403690}.gallery-camera::after{content:"";position:absolute;left:10px;top:-8px;width:23px;height:10px;border-radius:5px 5px 0 0;background:#8a73e7}
+.gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 11px}
+.gallery-item{position:relative;min-width:0;border:5px solid transparent;border-radius:16px;padding:0 0 10px;overflow:visible;background:linear-gradient(#fff,#fff) padding-box,repeating-linear-gradient(135deg,#f2a4b4 0 7px,#fff 7px 14px,#9aafea 14px 21px,#fff 21px 28px) border-box;box-shadow:0 7px 18px rgba(75,65,140,.1);cursor:pointer;text-align:left}
+.gallery-item::before{content:"";position:absolute;z-index:2;top:-9px;left:50%;width:28px;height:13px;border-radius:50%;background:radial-gradient(circle at 38% 30%,#d9d2ff,#8274cd 72%);box-shadow:0 3px 7px rgba(71,56,130,.22);transform:translateX(-50%)}
+.gallery-item img{display:block;width:100%;aspect-ratio:1.08;object-fit:cover;border-radius:10px 10px 8px 8px;transition:transform .2s}.gallery-item:active img{transform:scale(.98)}
+.gallery-time{position:absolute;left:8px;top:8px;z-index:3;padding:4px 7px;border-radius:8px;background:rgba(42,55,91,.7);backdrop-filter:blur(5px);color:#fff;font-size:9px;font-weight:750;line-height:1;box-shadow:0 2px 6px rgba(24,31,69,.16)}
+.gallery-title{display:block;padding:9px 8px 0;color:#28243b;font-size:11px;font-weight:750;line-height:1.4}.gallery-meta{display:block;padding:4px 8px 0;color:#aaa4b7;font-size:9px;line-height:1.25}
+/* 明信片浏览：沉浸式大图与底部收藏信笺 */
+.postcard-detail-page{position:relative;height:100%;overflow-y:auto;background:linear-gradient(180deg,#4e87bc 0%,#33468d 62%,#34398a 100%);color:#fff}
+.postcard-detail-back{position:absolute;left:16px;top:62px;z-index:5;color:#39405f}
+.postcard-detail-date{position:absolute;left:60px;right:24px;top:68px;z-index:4;font-size:14px;font-weight:700;text-align:center;text-shadow:0 2px 8px rgba(14,25,69,.5)}
+.postcard-detail-stage{position:relative;height:529px;overflow:hidden}.postcard-detail-stage::after{content:"";position:absolute;inset:42% 0 0;background:linear-gradient(transparent,rgba(45,61,135,.5) 46%,#35418a 95%)}
+.postcard-detail-stage img{display:block;width:100%;height:100%;object-fit:cover}
+.postcard-detail-content{position:relative;z-index:2;margin-top:-76px;padding:0 18px 28px}
+.postcard-detail-content h2{font-size:23px;line-height:1.3;text-shadow:0 2px 8px rgba(13,22,66,.28)}.postcard-detail-copy{display:-webkit-box;min-height:6.6em;margin-top:13px;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:4;color:rgba(255,255,255,.78);font-size:12px;line-height:1.65}
+.postcard-detail-info{display:flex;align-items:center;gap:8px;margin-top:12px}.postcard-detail-tag{padding:6px 10px;border-radius:15px;background:rgba(255,255,255,.14);font-size:10px}.postcard-detail-meta{margin-left:auto;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.09);color:rgba(255,255,255,.68);font-size:9px}
+.postcard-detail-letter{position:relative;margin-top:16px;padding:14px;border:5px solid transparent;border-radius:17px;background:linear-gradient(#fffaf0,#fffaf0) padding-box,repeating-linear-gradient(135deg,#f2a4b4 0 8px,#fff 8px 16px,#9aafea 16px 24px,#fff 24px 32px) border-box;box-shadow:0 14px 27px rgba(18,25,77,.2)}
+.postcard-detail-audio{display:flex;align-items:center;gap:10px;color:#273061}.postcard-detail-play{display:flex;align-items:center;justify-content:center;width:39px;height:39px;border:0;border-radius:50%;background:#283064;color:#fff;font-size:13px;cursor:pointer}.postcard-detail-wave{flex:1;overflow:hidden;white-space:nowrap;letter-spacing:2px;color:#767da0}.postcard-detail-audio time{font-size:10px;color:#777d99}
+.postcard-favorite{width:100%;margin-top:13px;padding:13px;border:0;border-radius:22px;background:#283064;color:#fff;font-size:14px;font-weight:750;cursor:pointer}.postcard-favorite.on{background:#f09b4c}
+.mine-page{height:100%;overflow-y:auto;padding:45px 16px 24px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
 .mine-page h1{margin-bottom:3px;font-size:25px;color:#19172a}.mine-page-subtitle{display:block;margin-bottom:17px;color:#77718c;font-size:12px}
+.growth-page{min-height:100%;padding:45px 0 100px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}.growth-page .greet{padding:0 20px 12px}.growth-page .greet h1{margin-top:0;font-size:25px}
 .mine-device-card{display:flex;align-items:center;gap:13px;width:100%;margin-bottom:14px;padding:13px 14px;border:0;border-radius:20px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.08);text-align:left;cursor:pointer}
 .mine-device-art{display:flex;align-items:center;justify-content:center;width:76px;height:66px;flex:none;overflow:hidden}.mine-device-art img{display:block;width:100%;height:100%;object-fit:contain}
 .mine-device-copy{flex:1;min-width:0}.mine-device-copy b{display:block;font-size:19px;color:#201d32}.mine-device-status{display:flex;align-items:center;gap:7px;margin-top:7px;color:#aaa3b8;font-size:11px}.mine-device-connection{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:#f0eef5;color:#9690a5;font-style:normal}.mine-device-connection i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#b9b3c8}.mine-device-connection.is-online{background:#edf7ec;color:#6f9a69}.mine-device-connection.is-online i{background:#7cb865}.mine-device-battery{padding:4px 8px;border-radius:11px;background:#eee9ff;color:#735ce6;font-style:normal;font-weight:650}
@@ -543,6 +564,14 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .help-answer{padding:0 0 14px;color:#817b8e;font-size:11.5px;line-height:1.65}.help-answer p{margin:0}.help-answer-media{display:block;width:100%;max-height:150px;margin-top:10px;border-radius:13px;object-fit:cover;object-position:center;box-shadow:0 3px 12px rgba(72,61,126,.08)}
 .profile-detail-page{position:relative;height:100%;overflow-y:auto;padding:15px 16px 28px;background:#f4f1ff}
 .profile-detail-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.profile-detail-head h1{font-size:20px;color:#17152a}
+/* 页面级标题统一：使用相同字号、行高和顶部安全区位置 */
+.gallery-head h1,.mine-page h1,.growth-page .greet h1,.profile-detail-head h1,.guide-detail-head h1,.guide-topic-head h1,.help-center-head h1,.account-management-head h1,.system-settings-head h1{font-size:21px;line-height:25px;font-weight:700}
+.mine-page{padding-top:63px}.growth-page{padding-top:63px}
+.help-center-page,.account-management-page,.system-settings-page{padding-top:11px}
+/* “我的”相关内页由自身背景覆盖全屏，状态栏透明叠加在页面背景上 */
+#profile-detail,#guide-detail,#guide-topic,#help-center,#account-management,#system-settings{padding-top:0;background:transparent}
+.profile-detail-page{padding-top:59px}.guide-detail-page,.guide-topic-page{padding-top:60px}
+.help-center-page,.account-management-page,.system-settings-page{padding-top:55px}
 .saved-profile-hero{display:flex;align-items:center;gap:13px;padding:17px;margin-bottom:12px;border-radius:20px;background:linear-gradient(135deg,#fff,#f3edff)}
 .saved-profile-avatar{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:50%;background:#e8ddff;font-size:28px}.saved-profile-hero h2{font-size:18px}.saved-profile-hero p{margin-top:3px;font-size:11px;color:#8a8498}
 .saved-profile-card{padding:4px 16px;border-radius:20px;background:#fff}
@@ -808,18 +837,20 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 
   <div class="scr" id="postcard-gallery">
     <div class="gallery-page">
-      <div class="gallery-head"><button class="gallery-back" id="gallery-back" aria-label="返回首页">‹</button><h1>成长高光明信片</h1></div>
-      <div class="gallery-sub">按时间收藏宝贝的每个高光瞬间</div>
+      <div class="gallery-head"><button class="gallery-back" id="gallery-back" aria-label="返回首页">‹</button><h1>成长高光时刻</h1></div>
+      <section class="gallery-hero" aria-label="成长高光介绍">
+        <h2>把每一刻的成长<br>都珍藏起来✨</h2>
+        <p>记录勇敢、好奇与热爱<br>这些瞬间都是独一无二的光芒</p>
+        <div class="gallery-mascot" aria-hidden="true"></div>
+        <div class="gallery-camera" aria-hidden="true"></div>
+      </section>
       <div class="gallery-grid">
-        <button class="gallery-item" data-gallery-src="assets/growth-postcard-future-painter.png" data-gallery-meta="2026年1月1日 · 18:57"><img src="assets/growth-postcard-future-painter.png" alt="宝贝画画的成长明信片"><span class="gallery-meta">1月1日<br>18:57</span></button>
-        <button class="gallery-item" data-gallery-src="assets/first-meeting-home.png" data-gallery-meta="2026年1月1日 · 12:59"><img src="assets/first-meeting-home.png" alt="宝贝和 Lukie 初见"><span class="gallery-meta">1月1日<br>12:59</span></button>
-        <button class="gallery-item" data-gallery-src="assets/story-first-watercolor-v2.png" data-gallery-meta="2026年1月1日 · 09:34"><img src="assets/story-first-watercolor-v2.png" alt="宝贝成长故事"><span class="gallery-meta">1月1日<br>09:34</span></button>
-        <button class="gallery-item" data-gallery-src="assets/story-journey-watercolor-v2.png" data-gallery-meta="2025年12月30日 · 19:08"><img src="assets/story-journey-watercolor-v2.png" alt="宝贝探索时刻"><span class="gallery-meta">12月30日<br>19:08</span></button>
-        <button class="gallery-item" data-gallery-src="assets/first-meeting-replay.png" data-gallery-meta="2025年12月30日 · 16:20"><img src="assets/first-meeting-replay.png" alt="初见纪念"><span class="gallery-meta">12月30日<br>16:20</span></button>
-        <button class="gallery-item" data-gallery-src="assets/story-handdrawn.png" data-gallery-meta="2025年12月30日 · 10:42"><img src="assets/story-handdrawn.png" alt="手绘成长故事"><span class="gallery-meta">12月30日<br>10:42</span></button>
-        <button class="gallery-item" data-gallery-src="assets/welcome-concept-a-memory-post-office.png" data-gallery-meta="2025年12月29日 · 20:36"><img src="assets/welcome-concept-a-memory-post-office.png" alt="成长明信片"><span class="gallery-meta">12月29日<br>20:36</span></button>
-        <button class="gallery-item" data-gallery-src="assets/story-journey-watercolor.png" data-gallery-meta="2025年12月29日 · 15:08"><img src="assets/story-journey-watercolor.png" alt="成长旅程"><span class="gallery-meta">12月29日<br>15:08</span></button>
-        <button class="gallery-item" data-gallery-src="assets/coach-intro-lukie.png" data-gallery-meta="2025年12月29日 · 09:12"><img src="assets/coach-intro-lukie.png" alt="Lukie 陪伴时刻"><span class="gallery-meta">12月29日<br>09:12</span></button>
+        <button class="gallery-item" data-gallery-src="assets/growth-postcard-future-painter.png" data-gallery-meta="2026年6月2日 · 18:57" data-gallery-title="小雨说长大后想要当一个非常出名的画家！"><span class="gallery-time">18:57</span><img src="assets/growth-postcard-future-painter.png" alt="宝贝画画的成长明信片"><span class="gallery-title">小雨说他想要当一个艺术家！</span><span class="gallery-meta">6月2日　星期日</span></button>
+        <button class="gallery-item" data-gallery-src="assets/first-meeting-home.png" data-gallery-meta="2026年6月1日 · 12:59"><span class="gallery-time">12:59</span><img src="assets/first-meeting-home.png" alt="宝贝和 Lukie 初见"><span class="gallery-title">小雨和 Lukie 第一次见面啦！</span><span class="gallery-meta">6月1日　星期六</span></button>
+        <button class="gallery-item" data-gallery-src="assets/story-first-watercolor-v2.png" data-gallery-meta="2026年5月30日 · 09:34"><span class="gallery-time">09:34</span><img src="assets/story-first-watercolor-v2.png" alt="宝贝成长故事"><span class="gallery-title">主动分享了今天最开心的事情</span><span class="gallery-meta">5月30日　星期四</span></button>
+        <button class="gallery-item" data-gallery-src="assets/story-journey-watercolor-v2.png" data-gallery-meta="2026年5月28日 · 19:08"><span class="gallery-time">19:08</span><img src="assets/story-journey-watercolor-v2.png" alt="宝贝探索时刻"><span class="gallery-title">第一次勇敢讲完自己的冒险故事</span><span class="gallery-meta">5月28日　星期二</span></button>
+        <button class="gallery-item" data-gallery-src="assets/first-meeting-replay.png" data-gallery-meta="2026年5月26日 · 16:20"><span class="gallery-time">16:20</span><img src="assets/first-meeting-replay.png" alt="初见纪念"><span class="gallery-title">和 Lukie 约定成为最好的伙伴</span><span class="gallery-meta">5月26日　星期日</span></button>
+        <button class="gallery-item" data-gallery-src="assets/story-handdrawn.png" data-gallery-meta="2026年5月24日 · 10:42"><span class="gallery-time">10:42</span><img src="assets/story-handdrawn.png" alt="手绘成长故事"><span class="gallery-title">把今天的小故事画成了一幅画</span><span class="gallery-meta">5月24日　星期五</span></button>
       </div>
     </div>
   </div>
@@ -827,8 +858,17 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   <div class="scr" id="postcard-detail">
     <div class="postcard-detail-page">
       <button class="gallery-back postcard-detail-back" id="postcard-detail-back" aria-label="返回上一页">‹</button>
+      <div class="postcard-detail-date" id="postcard-detail-date"></div>
       <div class="postcard-detail-stage"><img id="postcard-detail-image" alt="成长高光明信片详情"></div>
-      <div class="postcard-detail-meta" id="postcard-detail-meta"></div>
+      <div class="postcard-detail-content">
+        <h2 id="postcard-detail-title">小雨说长大后想要当一个非常出名的画家！</h2>
+        <p class="postcard-detail-copy" id="postcard-detail-copy">小雨多次提到“我想要当画家”，聊到画画能让他想到快乐，也希望将来用画传递温暖给别人。</p>
+        <div class="postcard-detail-info"><span class="postcard-detail-tag">😊 开心</span><span class="postcard-detail-tag">💪 太兴奋</span><span class="postcard-detail-meta" id="postcard-detail-meta"></span></div>
+        <section class="postcard-detail-letter" aria-label="成长时刻原声">
+          <div class="postcard-detail-audio"><button class="postcard-detail-play" type="button" aria-label="播放原声">▶</button><span class="postcard-detail-wave">┃│┃┃│┃│┃┃││┃│┃</span><time>08:00</time></div>
+          <button class="postcard-favorite" type="button">⭐ 收藏这份高光 ⭐</button>
+        </section>
+      </div>
     </div>
   </div>
 
@@ -1001,10 +1041,26 @@ let postcardDetailReturn='home';
 let splashTimer=null;
 let guideBannerDismissed=false;
 
-function openPostcardDetail(src,meta,returnPage){
+// 每张成长明信片配置四行详情文案，完整描述高光时刻的背景与意义。
+const postcardDetailCopies={
+  'growth-postcard-future-painter.png':'小雨多次提到“我想要当画家”，聊到画画能让他想到快乐，也希望将来用画传递温暖给别人。他认真描述了最喜欢的颜色和想画下的风景，这份清晰又热烈的向往，让我们看见了他正在萌芽的梦想。',
+  'first-meeting-home.png':'小雨第一次见到 Lukie 时，主动伸出手和它打招呼，还认真介绍了自己的名字与喜欢的事情。从最初的小心翼翼到慢慢放松下来，这次相遇为他们之后的陪伴，留下了温暖又特别的第一笔。',
+  'story-first-watercolor-v2.png':'小雨主动分享了今天最开心的一件事，还把事情发生的经过讲得很完整。说到有趣的地方时，他忍不住笑了起来，也愿意描述自己的真实感受。这份主动表达，让平凡的一天有了值得收藏的光亮。',
+  'story-journey-watercolor-v2.png':'小雨第一次独立讲完了自己想象的冒险故事，从出发、遇见困难到找到解决办法，每个情节都充满奇思妙想。即使中途停下来思考，他也没有放弃，而是继续把故事认真讲到了最后。',
+  'first-meeting-replay.png':'小雨和 Lukie 约定要成为最好的伙伴，一起聊天、听故事，也一起发现生活里的新鲜事。他郑重说出约定时既认真又期待，这份简单的信任，将成为未来许多温暖陪伴时刻的开始。',
+  'story-handdrawn.png':'小雨把今天发生的小故事画成了一幅画，用不同颜色记录人物、心情和最难忘的细节。他一边画一边解释自己的想法，也为画面补充了新的情节。这份创作让他的观察与表达变得更加生动。'
+};
+
+function openPostcardDetail(src,meta,returnPage,title){
   postcardDetailReturn=returnPage;
   $('#postcard-detail-image').src=src;
+  $('#postcard-detail-date').textContent=meta.replace('2026年','').replace('·','');
   $('#postcard-detail-meta').textContent=meta;
+  $('#postcard-detail-title').textContent=title||'小雨说长大后想要当一个非常出名的画家！';
+  const assetName=src.split('/').pop();
+  $('#postcard-detail-copy').textContent=postcardDetailCopies[assetName]||'这是小雨和 Lukie 一起留下的特别瞬间。每一次表达、发现和勇敢尝试，都正在成为成长里闪闪发光的记忆，也让我们看见他一点点变得更加勇敢、自信，并拥有属于自己的想法。';
+  $('.postcard-favorite').classList.remove('on');
+  $('.postcard-favorite').textContent='⭐ 收藏这份高光 ⭐';
   go('postcard-detail');
 }
 
@@ -1254,7 +1310,7 @@ function renderHomePostcard(kid,showFirstMeeting,showWaiting){
     return `<article class="v2card posthero postcard-status is-empty" id="home-postcards"><h3 class="postcard-waiting-title"><i class="postcard-envelope" aria-hidden="true"></i><span>今天没有高光时刻出现哦～</span></h3><div class="postcard-empty-copy">先去翻翻以前的明信片吧！<br>这里藏着好多小小的高光瞬间✨</div><button class="postcard-review-btn" type="button" data-go="postcard-gallery">翻翻以前的高光</button></article>`;
   }
   if(showFirstMeeting){
-    return `<article class="ref-card ref-highlight is-meeting-clear" id="home-postcards" data-go="first-meeting-replay"><div class="ref-highlight-copy"><h3>${kid} 和 Lukie<br>第一次见面啦！</h3><p>“你好呀，${kid}！我是 Lukie，以后就住在你家啦。”</p>${audio}</div></article>`;
+    return `<article class="ref-card ref-highlight is-meeting-clear" id="home-postcards"><div class="ref-highlight-copy"><h3>${kid} 和 Lukie<br>第一次见面啦！</h3><p>“你好呀，${kid}！我是 Lukie，以后就住在你家啦。”</p>${audio}</div></article>`;
   }
   return `<article class="ref-card ref-highlight is-painter" id="home-postcards"><div class="ref-highlight-copy"><h3>${kid}说长大后想要当<br>一个画家！</h3><p>${kid}多次提到“我想要当画家”，也希望将来用画传递温暖。</p>${audio}</div></article>`;
 }
@@ -1315,12 +1371,12 @@ function renderHome(s){
   }else if(s==='normal'||isNoData||isRisk){
     h+=`
     <div class="ref-home">
-      <section class="ref-hero"><span class="ref-online">Lukie 在线中</span><div class="ref-greet">${isNoData?'今天还静悄悄的，Lukie在等宝贝了哦～':'哇～今天能量爆棚！让他尽情开心去吧！'}</div><h1>${kid}现在状态<br><span class="ref-mood-state">${isNoData?'🌱 成长待记录':'🤩 情绪高涨'}</span></h1><div class="ref-lukie" aria-hidden="true"></div><div class="ref-prompt"><time>${isRisk?'2026年1月1日':'18:57'}</time><span class="ref-prompt-viewport"><span class="ref-prompt-text">🌙 为什么陆地上最大型的爬行动物是科莫多巨蜥？</span></span><span class="ref-prompt-arrow">›</span></div></section>
+      <section class="ref-hero"><span class="ref-online">Lukie 在线中 ›</span><h1>${isNoData?'等待今日心情':isRisk?'情绪偏低':'轻松开心'}</h1><div class="ref-hero-subtitle">${isNoData?'别忘啦～今天也给孩子一点和 Lukie 聊天的时间。':isRisk?'今天多抱抱、多听听～让孩子知道你一直在。':'今天心情挺不错～多听听他开心的事吧。'}</div><div class="ref-lukie" aria-hidden="true"></div><div class="ref-prompt"><time>${isRisk?'2026年1月1日':'18:57'}</time><span class="ref-prompt-viewport"><span class="ref-prompt-text">🌙 为什么陆地上最大型的爬行动物是科莫多巨蜥？</span></span><span class="ref-prompt-arrow">›</span></div></section>
       ${renderGuideBanner()}
       ${isGuide||isRisk?`<section class="ref-danger" id="home-attention" aria-label="高危情绪提醒"><div class="ref-danger-head"><span class="ref-danger-bot" aria-hidden="true"></span><span class="ref-danger-alert">‼</span><span>需要关注</span></div><p>小雨今天说了 3 次“我想离家出走”，今晚可以和孩子聊聊考试压力，先帮助他平静下来。</p></section>`:''}
       ${isNoData?'':`<div class="ref-insight-group" id="home-overview">
-        <section class="ref-card ref-metrics"><div class="ref-metric"><div class="ref-label">今日心情指数</div><div class="ref-value">72 <small>/ 100</small></div></div><div class="ref-metric"><div class="ref-label">今日对话次数</div><div class="ref-value">23 <small>次</small></div></div><div class="ref-metric"><div class="ref-label">今日话题标签</div><div class="ref-tags"><button class="ref-topic" data-topic="创造力" aria-label="创造力">⭐</button><button class="ref-topic" data-topic="艺术表达" aria-label="艺术表达">🎨</button><button class="ref-topic" data-topic="坚持与成长" aria-label="坚持与成长">💪</button><div class="ref-topic-bubble" id="topic-bubble"></div></div></div></section>
-        <section class="ref-card ref-summary"><div class="ref-summary-time">今日总结 · 13:00</div><h3>今天${kid}整体情绪不错</h3><p>今天的你节奏很稳，在分享新发现时显得专注又轻松。当你说起晚霞、风和云边的光时，情绪也慢慢变得柔和。</p><div class="ref-summary-art"></div></section>
+        <section class="ref-card ref-metrics"><div class="ref-metric"><div class="ref-label">今日心情指数</div><div class="ref-value">${isRisk?'15':'72'} <small>/ 100</small></div></div><div class="ref-metric"><div class="ref-label">今日对话次数</div><div class="ref-value">23 <small>次</small></div></div><div class="ref-metric"><div class="ref-label">今日话题标签</div><div class="ref-tags"><button class="ref-topic" data-topic="创造力" aria-label="创造力">⭐</button><button class="ref-topic" data-topic="艺术表达" aria-label="艺术表达">🎨</button><button class="ref-topic" data-topic="坚持与成长" aria-label="坚持与成长">💪</button><div class="ref-topic-bubble" id="topic-bubble"></div></div></div></section>
+        <section class="ref-card ref-summary"><div class="ref-summary-time">今日总结 · 13:00</div><h3>${isRisk?`今天${kid}情绪有些低落`:`今天${kid}整体情绪不错`}</h3><p>${isRisk?'今天多关注一下孩子，陪他聊聊、抱抱他吧。':'今天的你节奏很稳，在分享新发现时显得专注又轻松。当你说起晚霞、风和云边的光时，情绪也慢慢变得柔和。'}</p><div class="ref-summary-art"></div></section>
       </div>`}
       <div class="ref-section-head"><h2>成长高光明信片</h2><button class="ref-more" data-go="postcard-gallery">查看更多 ›</button></div>
       ${renderHomePostcard(kid,isFirstPostcard,isFirstEmpty)}
@@ -1346,12 +1402,15 @@ function renderHome(s){
   const guideClose=$('[data-dismiss-guide]');
   if(guideClose)guideClose.addEventListener('click',()=>{guideBannerDismissed=true;renderHome(homeState);});
   const homePostcard=$('#home-postcards');
-  if(homePostcard&&(homeState==='normal'||homeState==='risk')){
+  if(homePostcard&&(homeState==='normal'||homeState==='risk'||homeState==='first-postcard')){
     homePostcard.classList.add('is-clickable');
     homePostcard.setAttribute('role','button');
     homePostcard.setAttribute('tabindex','0');
-    homePostcard.setAttribute('aria-label','查看成长明信片大图');
-    const openHomePostcard=()=>openPostcardDetail('assets/growth-postcard-future-painter.png','2026年1月1日 · 18:57','home');
+    homePostcard.setAttribute('aria-label','查看成长高光时刻详情');
+    // 仅明信片状态进入统一的高光时刻内页，不再打开独立图片页。
+    const openHomePostcard=()=>homeState==='first-postcard'
+      ?openPostcardDetail('assets/first-meeting-home.png','2026年6月1日 · 12:59','home',`${kid} 和 Lukie 第一次见面啦！`)
+      :openPostcardDetail('assets/growth-postcard-future-painter.png','2026年1月1日 · 18:57','home');
     homePostcard.addEventListener('click',openHomePostcard);
     homePostcard.addEventListener('keydown',event=>{
       if(event.key==='Enter'||event.key===' '){event.preventDefault();openHomePostcard();}
@@ -1411,9 +1470,21 @@ function renderHome(s){
 
 /* ---------- 成长高光明信片相册 ---------- */
 $$('[data-gallery-src]').forEach(item=>item.addEventListener('click',()=>{
-  openPostcardDetail(item.dataset.gallerySrc,item.dataset.galleryMeta,'postcard-gallery');
+  openPostcardDetail(item.dataset.gallerySrc,item.dataset.galleryMeta,'postcard-gallery',item.dataset.galleryTitle||item.querySelector('.gallery-title').textContent);
 }));
 $('#postcard-detail-back').addEventListener('click',()=>go(postcardDetailReturn));
+// 浏览页支持原声播放状态和收藏状态切换。
+$('.postcard-detail-play').addEventListener('click',event=>{
+  const button=event.currentTarget;
+  const isPlaying=button.classList.toggle('on');
+  button.textContent=isPlaying?'Ⅱ':'▶';
+  button.setAttribute('aria-label',isPlaying?'暂停原声':'播放原声');
+});
+$('.postcard-favorite').addEventListener('click',event=>{
+  const button=event.currentTarget;
+  const isFavorite=button.classList.toggle('on');
+  button.textContent=isFavorite?'★ 已收藏这份高光 ★':'⭐ 收藏这份高光 ⭐';
+});
 $('#gallery-back').addEventListener('click',()=>{
   renderHome(homeState);
   go('home');
@@ -1663,8 +1734,8 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>{
   if(t.dataset.tab==='mine'){
     renderMineTab();
   }else if(t.dataset.tab!=='today'){
-    $('#home-body').innerHTML=`<div class="greet" style="padding:20px 20px 12px"><h1>${t.dataset.tab==='growth'?'成长':'我的'}</h1></div>
-    <div class="v2card"><p>${t.dataset.tab==='growth'?'成长趋势、情绪曲线与统计将在积累 7 天数据后解锁 🌱（Mood Curve 放在这里，不占首页）':'设置、设备管理、家庭成员（原型占位）'}</p></div>`;
+    $('#home-body').innerHTML=`<div class="growth-page"><div class="greet"><h1>成长</h1></div>
+    <div class="v2card"><p>成长趋势、情绪曲线与统计将在积累 7 天数据后解锁 🌱（Mood Curve 放在这里，不占首页）</p></div></div>`;
   }else{renderHome(homeState);}
 }));
 
