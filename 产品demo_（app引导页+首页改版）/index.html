@@ -317,6 +317,10 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .v2card.posthero.postcard-status .stampmark{top:91px;right:13px;left:auto;border:2px solid rgba(166,101,58,.55);border-radius:50%;padding:8px 5px;background:transparent;color:#9d653f;transform:rotate(10deg);font-size:8px;letter-spacing:.4px}
 .postcard-state{display:inline-flex;align-items:center;gap:5px;margin-top:11px;padding:5px 9px;border-radius:10px;background:#f6e7d5;color:#a66e32;font-size:11px;font-weight:650}
 .postcard-state i{width:6px;height:6px;border-radius:50%;background:#e49a4b;box-shadow:0 0 0 3px rgba(228,154,75,.16)}
+/* 无数据明信片：完整展示引导文案和回顾入口 */
+.postcard-status.is-empty{min-height:0;padding-right:92px!important}
+.postcard-empty-copy{max-width:220px;margin-top:13px;color:#765f4b;font-size:12px;line-height:1.72}
+.postcard-review-btn{margin-top:15px;padding:8px 14px;border:0;border-radius:15px;background:#a66e42;color:#fff;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 4px 10px rgba(132,81,43,.2)}
 .first-attention{position:relative;margin:0 14px 12px;padding:15px 15px 15px 57px;border:1.5px solid #ffb9b9;border-radius:19px;background:linear-gradient(135deg,#ffe4e4,#ffd9d9);box-shadow:0 4px 13px rgba(214,61,61,.1)}
 .first-attention-icon{position:absolute;left:14px;top:14px;display:flex;align-items:center;justify-content:center;width:33px;height:33px;border:3px solid #ff3535;border-radius:11px;background:#15151b;color:#4cff65;font-size:15px;box-shadow:0 0 0 3px rgba(255,53,53,.12)}
 .first-attention b{display:block;margin-bottom:4px;font-size:13px;color:#e52f35}
@@ -424,7 +428,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .ref-section-head span{font-size:11px;color:#7b758a}
 .ref-more{border:0;background:transparent;color:#7b758a;font-size:11px;cursor:pointer;padding:5px 0}
 .ref-highlight{position:relative;min-height:230px;padding:0;overflow:hidden;border:6px solid transparent;border-radius:22px;background:linear-gradient(145deg,rgba(37,45,83,.14),rgba(30,24,48,.84)),url('assets/first-meeting-home.png') center/cover padding-box,repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px) border-box;color:#fff}
-.ref-highlight.is-meeting-clear{background:url('assets/first-meeting-home.png') center/cover no-repeat padding-box,repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px) border-box}
+.ref-highlight.is-meeting-clear{border-radius:0;background:url('assets/first-meeting-home.png') center/cover no-repeat padding-box,repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px) border-box}
 .ref-highlight.is-meeting-clear .ref-highlight-copy{background:transparent;text-shadow:0 2px 8px rgba(0,0,0,.72)}
 .ref-highlight.is-painter{min-height:250px;border:6px solid transparent;border-radius:0;background-color:#f5eadc;background-image:url('assets/growth-postcard-future-painter.png?v=2'),repeating-linear-gradient(135deg,#f4a0ad 0 8px,#fff 8px 16px,#8fa9e9 16px 24px,#fff 24px 32px)!important;background-position:center,center!important;background-size:cover,auto!important;background-repeat:no-repeat,repeat!important;background-origin:padding-box,border-box!important;background-clip:padding-box,border-box!important}
 .ref-highlight.is-painter::before,.ref-highlight.is-painter::after{content:none!important;display:none!important;background:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
@@ -456,6 +460,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .ref-stream-item{display:grid;grid-template-columns:45px 1fr 34px;gap:12px;align-items:center;padding:14px;border-radius:20px;background:#fff}
 .ref-stream-icon{display:flex;align-items:center;justify-content:center;width:45px;height:45px;border-radius:13px;background:#fff0c7;font-size:21px}
 .ref-stream-copy{min-width:0}.ref-stream-copy h3{font-size:14px;margin-bottom:3px}.ref-stream-copy p{font-size:11px;color:#7d788b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ref-stream-item.is-empty{grid-template-columns:45px minmax(0,1fr)}.ref-stream-item.is-empty .ref-stream-copy p{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.55}
 .ref-stream-history .ref-stream-copy p{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:4;white-space:normal;text-overflow:clip;line-height:1.62}
 .risk-stream .ref-stream-item{align-items:start}.risk-stream .ref-stream-copy h3{line-height:1.45}.risk-stream .ref-stream-copy p{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.62}
 .ref-stream-tags{margin-top:6px}.ref-stream-tags span{display:inline-block;margin-right:5px;padding:3px 8px;border-radius:10px;background:#eee9ff;color:#735ce6;font-size:9.5px}
@@ -529,6 +534,9 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .help-center-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:#f1efff}
 .help-center-head{position:relative;display:flex;align-items:center;justify-content:center;height:42px;margin-bottom:15px}.help-center-head h1{font-size:21px;color:#211d34}.help-center-head .gallery-back{position:absolute;left:0}
 .account-management-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:#f1efff}.account-management-head{position:relative;display:flex;align-items:center;justify-content:center;height:42px;margin-bottom:15px}.account-management-head h1{font-size:21px;color:#211d34}.account-management-head .gallery-back{position:absolute;left:0}.account-card{margin-bottom:13px;padding:17px 16px;border-radius:20px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05)}.account-card-title{display:block;margin-bottom:24px;color:#aaa5ba;font-size:15px;font-weight:650}.account-empty{padding:14px 0 4px;color:#aaa5ba;font-size:16px;text-align:center}.account-provider-card{padding:17px 0 0}.account-provider-card .account-card-title{padding:0 16px}.account-provider{display:flex;align-items:center;gap:14px;width:100%;min-height:72px;padding:0 16px;box-sizing:border-box;border:0;border-bottom:1px solid #f0edf6;background:transparent;color:#171522;font-family:inherit;font-size:15px;text-align:left;cursor:pointer}.account-provider:last-child{border-bottom:0}.account-provider-brand{display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:none;font-size:25px;font-weight:700;line-height:1}.account-provider-brand.apple{color:#111}.account-provider-brand.google{background:conic-gradient(from -45deg,#4285f4 0 25%,#34a853 0 45%,#fbbc05 0 68%,#ea4335 0 85%,#4285f4 0);-webkit-background-clip:text;background-clip:text;color:transparent;font-family:Arial,sans-serif;font-size:26px}.account-provider-label{flex:1}.account-bind{padding:9px 14px;border:0;border-radius:999px;background:#eee9ff;color:#735ce6;font-family:inherit;font-size:13px;font-weight:650;cursor:pointer}.account-danger{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;margin:0 0 13px;padding:0 16px;border:0;border-radius:18px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05);color:#df4c59;font-family:inherit;font-size:14px;text-align:left;cursor:pointer}.account-danger .mine-row-label{flex:1}.account-danger .mine-row-arrow{color:#df4c59}
+.system-settings-page{display:flex;height:100%;overflow-y:auto;flex-direction:column;padding:16px 16px 30px;background:#f1efff}
+.system-settings-head{position:relative;display:flex;align-items:center;justify-content:center;height:42px;margin-bottom:15px}.system-settings-head h1{font-size:21px;color:#211d34}.system-settings-head .gallery-back{position:absolute;left:0}
+.system-settings-card{margin-bottom:13px;border-radius:18px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.06);overflow:hidden}.system-settings-card-title{display:block;padding:15px 15px 8px;color:#aaa5ba;font-size:12px;font-weight:650}.system-settings-card .mine-row{box-shadow:none}.system-settings-page .mine-logout{flex:none;margin-top:auto}
 .help-group{margin-bottom:12px;padding:16px;border-radius:20px;background:#fff;box-shadow:0 3px 13px rgba(72,61,126,.05)}
 .help-group-title{margin:0 0 10px;color:#aaa5ba;font-size:15px;font-weight:650}
 .help-question{border-bottom:1px solid #f0edf6}.help-question:last-child{border-bottom:0}.help-question summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:53px;color:#171522;font-size:14px;font-weight:550;line-height:1.45;cursor:pointer;list-style:none}.help-question summary::-webkit-details-marker{display:none}.help-question summary::after{content:'⌄';flex:none;color:#aaa4bb;font-size:21px;line-height:1;transform:translateY(-2px)}.help-question[open] summary::after{content:'⌃';transform:translateY(2px)}
@@ -563,6 +571,7 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   <button class="pbtn" id="btn-mine-home">我的</button>
   <button class="pbtn" id="btn-profile-detail">我的-宝贝档案</button>
   <button class="pbtn" id="btn-account-management">我的-账号管理</button>
+  <button class="pbtn" id="btn-system-settings">我的-系统设置</button>
   <button class="pbtn" id="btn-guide-detail">我的-使用指南</button>
   <div class="pnote">启动页 → 欢迎页 → 家长/监护人身份确认 → 登录或注册 → 家长授权 → 账号注册成功 → 设备联网 → 设备激活 → 宝贝档案 → 交接仪式 → 首页新手引导 → 首日态（仅初见明信片）→ 首页日常态（无数据 / 有数据 / 有高危数据）→ 成长高光明信片图库 → 明信片图片详情。</div>
 </div>
@@ -937,7 +946,26 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
         <button class="account-provider" type="button"><span class="account-provider-brand apple" aria-hidden="true"></span><span class="account-provider-label">使用 Apple</span><span class="account-bind">绑定</span></button>
         <button class="account-provider" type="button"><span class="account-provider-brand google" aria-hidden="true">G</span><span class="account-provider-label">使用 Google</span><span class="account-bind">绑定</span></button>
       </section>
-      <button class="account-danger" type="button"><span class="mine-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 4h4l1 3H9l1-3zM7 7l.8 13h8.4L17 7M10 10v6M14 10v6"></path></svg></span><span class="mine-row-label">注销账号</span><span class="mine-row-arrow">›</span></button>
+    </div>
+  </div>
+
+  <div class="scr" id="system-settings">
+    <div class="system-settings-page">
+      <div class="system-settings-head"><button class="gallery-back" id="system-settings-back" aria-label="返回我的">‹</button><h1>系统设置</h1></div>
+      <section class="system-settings-card" aria-label="隐私说明">
+        <span class="system-settings-card-title">隐私说明</span>
+        <button class="mine-row" type="button" data-mine-action="用户服务协议"><span class="mine-row-label">用户服务协议</span><span class="mine-row-arrow">›</span></button>
+        <button class="mine-row" type="button" data-mine-action="隐私政策"><span class="mine-row-label">隐私政策</span><span class="mine-row-arrow">›</span></button>
+        <button class="mine-row" type="button" data-mine-action="个人信息第三方共享清单"><span class="mine-row-label">个人信息第三方共享清单</span><span class="mine-row-arrow">›</span></button>
+      </section>
+      <section class="system-settings-card" aria-label="其他设置">
+        <span class="system-settings-card-title">其他设置</span>
+        <button class="mine-row" type="button" data-mine-action="语言设置"><span class="mine-row-label">语言设置</span><span class="mine-row-value">中文</span><span class="mine-row-arrow">›</span></button>
+        <button class="mine-row" type="button" data-mine-action="用户反馈"><span class="mine-row-label">用户反馈</span><span class="mine-row-arrow">›</span></button>
+        <button class="mine-row" type="button" data-mine-action="应用版本"><span class="mine-row-label">应用版本</span><span class="mine-row-value">V1.0.5</span><span class="mine-row-arrow">›</span></button>
+      </section>
+      <button class="account-danger" type="button" data-mine-action="注销账号"><span class="mine-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 4h4l1 3H9l1-3zM7 7l.8 13h8.4L17 7M10 10v6M14 10v6"></path></svg></span><span class="mine-row-label">注销账号</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-logout" type="button" data-mine-action="退出登录">退出登录</button>
     </div>
   </div>
 
@@ -1224,7 +1252,7 @@ function sky(cls,blobCls,kid,title,status){return `
 function renderHomePostcard(kid,showFirstMeeting,showWaiting){
   const audio='<div class="ref-audio"><button class="ref-audio-play" type="button" aria-label="播放原声" aria-pressed="false">▶</button><span class="ref-wave">∣∣┃∣┃┃∣┃∣┃∣∣┃</span><time>00:28</time></div>';
   if(showWaiting){
-    return `<article class="v2card posthero postcard-status" id="home-postcards"><h3 class="postcard-waiting-title"><i class="postcard-envelope" aria-hidden="true"></i><span>今天的明信片正在路上</span></h3><div class="quote">「和 Lukie 说说今天最特别的一件事吧」</div><p>等一个特别的故事发生</p></article>`;
+    return `<article class="v2card posthero postcard-status is-empty" id="home-postcards"><h3 class="postcard-waiting-title"><i class="postcard-envelope" aria-hidden="true"></i><span>今天没有高光时刻出现哦～</span></h3><div class="postcard-empty-copy">先去翻翻以前的明信片吧！<br>这里藏着好多小小的高光瞬间✨</div><button class="postcard-review-btn" type="button" data-go="postcard-gallery">翻翻以前的高光</button></article>`;
   }
   if(showFirstMeeting){
     return `<article class="ref-card ref-highlight is-meeting-clear" id="home-postcards" data-go="first-meeting-replay"><div class="ref-highlight-copy"><h3>${kid} 和 Lukie<br>第一次见面啦！</h3><p>“你好呀，${kid}！我是 Lukie，以后就住在你家啦。”</p>${audio}</div></article>`;
@@ -1301,7 +1329,7 @@ function renderHome(s){
       <div id="home-stream-today">
       <div class="ref-section-head"><h2>成长时刻</h2></div>
       <div class="ref-stream${isRisk?' risk-stream':''}" id="home-stream">
-        ${isNoData?`<article class="ref-stream-item" id="home-stream-first"><div class="ref-stream-icon">💬</div><div class="ref-stream-copy"><h3>今日还没有对话时光哦</h3><p>和 Lukie 开始聊天后，今天的时光会记录在这里</p></div></article>`:isRisk?`<article class="ref-stream-item" id="home-stream-first"><div class="ref-stream-icon">🐰</div><div class="ref-stream-copy"><h3>谈到送给妈妈道歉用的一张心形兔子的插画</h3><p>孩子讲到自己看了插画:一只小兔子画了心形并送给妈妈后，情绪里出现了温暖与分享的兴致。这个表达让人看到他在意“爱与被照顾”的主题，也愿意把感动讲出来给您听。</p><div class="ref-stream-tags"><span>🥰 温暖</span><span>😌 安心</span></div></div><div class="ref-stream-time">18:57<div class="ref-stream-play">▶</div></div></article>
+        ${isNoData?`<article class="ref-stream-item is-empty" id="home-stream-first"><div class="ref-stream-icon">💬</div><div class="ref-stream-copy"><h3>今天的故事还空着</h3><p>和Lukie聊一聊，把今天的小故事留下来吧～</p></div></article>`:isRisk?`<article class="ref-stream-item" id="home-stream-first"><div class="ref-stream-icon">🐰</div><div class="ref-stream-copy"><h3>谈到送给妈妈道歉用的一张心形兔子的插画</h3><p>孩子讲到自己看了插画:一只小兔子画了心形并送给妈妈后，情绪里出现了温暖与分享的兴致。这个表达让人看到他在意“爱与被照顾”的主题，也愿意把感动讲出来给您听。</p><div class="ref-stream-tags"><span>🥰 温暖</span><span>😌 安心</span></div></div><div class="ref-stream-time">18:57<div class="ref-stream-play">▶</div></div></article>
         <article class="ref-stream-item"><div class="ref-stream-icon">✈️</div><div class="ref-stream-copy"><h3>练习旅行英语口语与紧张情绪</h3><p>孩子表示想学英语口语并带着些许难过与紧张，随后把练习方向聚焦到“旅行用英语”。当对话切换到更具体的情境句子后，他的互动更明确，这种把焦虑落到可练内容的方式值得肯定，说明他在努力向前迈一步。</p><div class="ref-stream-tags"><span>😟 紧张</span><span>🙂 平静</span></div></div><div class="ref-stream-time">12:59<div class="ref-stream-play">▶</div></div></article>
         <article class="ref-stream-item"><div class="ref-stream-icon">🔐</div><div class="ref-stream-copy"><h3>银行卡密码与隐私边界对话</h3><p>孩子询问并重复了银行卡密码相关信息，同时对"是否知道密码"感到有点难过.lukie 通过强调不不存储敏感信息来守住隐私边界，帮助孩子把注意力回到安全与规则上，情绪波动不大、互动保持理性。</p><div class="ref-stream-tags"><span>😔 难过</span><span>😐 平静</span></div></div><div class="ref-stream-time">09:34<div class="ref-stream-play">▶</div></div></article>`:`<article class="ref-stream-item" id="home-stream-first"><div class="ref-stream-icon">🚀</div><div class="ref-stream-copy"><h3>拼了火箭乐高</h3><p>没喊一次我不会，自己独立拼完</p><div class="ref-stream-tags"><span>😤 坚持</span><span>😄 自豪</span></div></div><div class="ref-stream-time">18:57<div class="ref-stream-play">▶</div></div></article>
         <article class="ref-stream-item"><div class="ref-stream-icon">🦕</div><div class="ref-stream-copy"><h3>主动要求听《史前一万年》</h3><p>听到霸王龙出来的那章，非常兴奋</p><div class="ref-stream-tags"><span>🤩 兴奋</span><span>🧐 好奇</span></div></div><div class="ref-stream-time">12:59<div class="ref-stream-play">▶</div></div></article>
@@ -1409,6 +1437,7 @@ const mineIcons={
   help:'<circle cx="12" cy="12" r="8.5"></circle><path d="M9.7 9a2.4 2.4 0 1 1 3.9 1.9c-1.1.8-1.6 1.2-1.6 2.6M12 16.5v.1"></path>',
   feedback:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H10l-4.8 4v-4.3A2.5 2.5 0 0 1 4 12.5v-7z"></path><path d="M8 8h8M8 11h5"></path>',
   version:'<circle cx="12" cy="12" r="8.5"></circle><path d="M12 10v5M12 7.5v.1"></path>',
+  settings:'<circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21h-4v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3.1 14H3v-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.5V3h4v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1v4h-.1a1.7 1.7 0 0 0-1.5 1z"></path>',
   delete:'<path d="M5 7h14M10 4h4l1 3H9l1-3zM7 7l.8 13h8.4L17 7M10 10v6M14 10v6"></path>'
 };
 function mineIcon(name){return `<span class="mine-row-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${mineIcons[name]}</svg></span>`;}
@@ -1426,15 +1455,10 @@ function renderMineTab(){
       <button class="mine-row" type="button" data-mine-action="伙伴管理">${mineIcon('partner')}<span class="mine-row-label">伙伴管理</span><span class="mine-row-arrow">›</span></button>
       <button class="mine-row" type="button" data-mine-action="流量专区">${mineIcon('traffic')}<span class="mine-row-label">流量专区</span><span class="mine-row-arrow">›</span></button>
     </section>
-    <section class="mine-section" aria-label="应用设置">
-      <button class="mine-row" type="button" data-mine-action="隐私说明">${mineIcon('privacy')}<span class="mine-row-label">隐私说明</span><span class="mine-row-arrow">›</span></button>
-      <button class="mine-row" type="button" data-mine-action="语言设置">${mineIcon('language')}<span class="mine-row-label">语言设置</span><span class="mine-row-value">中文</span><span class="mine-row-arrow">›</span></button>
+    <section class="mine-section" aria-label="帮助与设置">
       <button class="mine-row" type="button" data-open-guide>${mineIcon('guide')}<span class="mine-row-label">使用指南</span><span class="mine-row-arrow">›</span></button>
-      <button class="mine-row" type="button" data-open-help>${mineIcon('help')}<span class="mine-row-label">帮助中心</span><span class="mine-row-arrow">›</span></button>
-      <button class="mine-row" type="button" data-mine-action="用户反馈">${mineIcon('feedback')}<span class="mine-row-label">用户反馈</span><span class="mine-row-arrow">›</span></button>
-      <button class="mine-row" type="button" data-mine-action="应用版本">${mineIcon('version')}<span class="mine-row-label">应用版本</span><span class="mine-row-value">V1.0.5</span><span class="mine-row-arrow">›</span></button>
+      <button class="mine-row" type="button" data-open-system-settings>${mineIcon('settings')}<span class="mine-row-label">系统设置</span><span class="mine-row-arrow">›</span></button>
     </section>
-    <button class="mine-logout" type="button">退出登录</button>
   </div>`;
 }
 function openGuide(){
@@ -1572,6 +1596,11 @@ function openAccountManagement(){
   $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
   go('account-management');
 }
+// 系统设置独立承载隐私、语言、反馈、版本和退出登录入口。
+function openSystemSettings(){
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  go('system-settings');
+}
 function populateProfileEditor(){
   $('#edit-kid-name').value=$('#kid-name').value.trim()||'小雨';
   $('#edit-kid-birthday').value=$('#kid-birthday').value||'2018-06-18';
@@ -1586,6 +1615,7 @@ document.addEventListener('click',event=>{
   if(event.target.closest('[data-open-guide]')){openGuide();return;}
   if(event.target.closest('[data-open-help]')){openHelpCenter();return;}
   if(event.target.closest('[data-open-account]')){openAccountManagement();return;}
+  if(event.target.closest('[data-open-system-settings]')){openSystemSettings();return;}
   if(!event.target.closest('[data-open-profile]'))return;
   populateProfileEditor();
   go('profile-detail');
@@ -1620,6 +1650,11 @@ $('#help-center-back').addEventListener('click',()=>{
   renderMineTab();
 });
 $('#account-management-back').addEventListener('click',()=>{
+  go('home');
+  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
+  renderMineTab();
+});
+$('#system-settings-back').addEventListener('click',()=>{
   go('home');
   $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
   renderMineTab();
@@ -1663,6 +1698,11 @@ $('#btn-account-management').addEventListener('click',()=>{
   $$('.home-state').forEach(x=>x.classList.remove('on'));
   clearCoachFocus();$('#coach').classList.remove('on');
   openAccountManagement();
+});
+$('#btn-system-settings').addEventListener('click',()=>{
+  $$('.home-state').forEach(x=>x.classList.remove('on'));
+  clearCoachFocus();$('#coach').classList.remove('on');
+  openSystemSettings();
 });
 $('#btn-guide-detail').addEventListener('click',()=>{
   $$('.home-state').forEach(x=>x.classList.remove('on'));
