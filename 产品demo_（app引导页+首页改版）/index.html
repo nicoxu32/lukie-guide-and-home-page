@@ -496,14 +496,17 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
 .guide-detail-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
 .guide-detail-head{display:flex;align-items:center;gap:10px;margin-bottom:16px}.guide-detail-head h1{font-size:21px;color:#211d34}
 .guide-detail-subtitle{display:block;margin:-7px 3px 16px;color:#77718c;font-size:12px;line-height:1.5}
+.guide-category-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-bottom:12px;padding:4px;border-radius:14px;background:rgba(226,220,247,.68)}
+.guide-category-tab{min-height:38px;padding:8px 10px;border:0;border-radius:11px;background:transparent;color:#817b8e;font-family:inherit;font-size:12px;font-weight:650;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s}
+.guide-category-tab.on{background:#fff;color:#5d49c7;box-shadow:0 3px 10px rgba(72,61,126,.1)}
 .guide-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.guide-item{display:flex;min-height:142px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px 10px;border:1px solid rgba(222,214,255,.9);border-radius:16px;background:rgba(255,255,255,.84);box-shadow:0 3px 12px rgba(72,61,126,.05);text-align:center;font-family:inherit;cursor:pointer}
+.guide-category-panel{display:none}.guide-category-panel.on{display:grid}
+.guide-item{display:flex;min-height:116px;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:12px 10px;border:1px solid rgba(222,214,255,.9);border-radius:16px;background:rgba(255,255,255,.84);box-shadow:0 3px 12px rgba(72,61,126,.05);text-align:center;font-family:inherit;cursor:pointer}
 .guide-item-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:13px;background:#eee9ff;font-size:22px}
-.guide-item b{font-size:13px;font-weight:650;line-height:1.35;color:#2d2940;overflow-wrap:anywhere}
-.guide-item-desc{display:block;min-height:30px;color:#817b8e;font-size:10.5px;line-height:1.45}
+.guide-item b{font-size:13px;font-weight:650;line-height:1.45;color:#2d2940;overflow-wrap:anywhere}
 .guide-item-tags{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;min-height:18px}
 .guide-item-tags i{padding:3px 6px;border-radius:8px;background:#f3efff;color:#735ce6;font-size:9px;font-style:normal;line-height:1}
-.guide-help-link{margin:0}
+.guide-help-link{margin:0}.guide-help-wide{width:100%;min-height:70px;margin-top:10px;flex-direction:row;justify-content:flex-start;padding:12px 18px;text-align:left}.guide-help-wide .guide-item-icon{width:40px;height:40px}.guide-help-wide b{flex:1}
 .guide-help-card-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:13px;background:#eee9ff;color:#735ce6;font-size:22px;font-weight:700}.guide-help-card-copy{display:block;flex:0;min-width:0}.guide-help-card-copy b{font-size:13px;font-weight:650;line-height:1.45;color:#2d2940}.guide-help-card-copy small,.guide-help-card-arrow{display:none}
 .guide-wifi-page{height:100%;overflow-y:auto;padding:16px 16px 30px;background:linear-gradient(155deg,#f2efff 0%,#fff8f3 100%)}
 .guide-wifi-page .gallery-back{margin-bottom:8px}
@@ -850,19 +853,26 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     <div class="guide-detail-page">
       <div class="guide-detail-head"><button class="gallery-back" id="guide-detail-back" aria-label="返回我的">‹</button><h1>使用指南</h1></div>
       <p class="guide-detail-subtitle">按场景查看操作，卡片内已汇总语音、按键和屏幕反馈</p>
-      <div class="guide-list">
-        <button class="guide-item" type="button" data-guide-topic="power"><span class="guide-item-icon">⏻</span><b>开机、唤醒与关机</b><span class="guide-item-desc">从开机到对话，一次看懂按键和唤醒</span></button>
-        <button class="guide-item" type="button" data-guide-topic="voice"><span class="guide-item-icon">🎙</span><b>语音控制</b><span class="guide-item-desc">音量、亮度、文字、字号都能动口调</span></button>
-        <button class="guide-item" type="button" data-guide-topic="quick"><span class="guide-item-icon">◀▶</span><b>快捷设置</b><span class="guide-item-desc">左右键组合进入，五项设置即按即调</span></button>
-        <button class="guide-item" type="button" data-guide-topic="connect"><span class="guide-item-icon">📶</span><b>WiFi 联网与激活</b><span class="guide-item-desc">扫描、连接、激活每一步都有全屏引导</span></button>
-        <button class="guide-item" type="button" data-guide-topic="display"><span class="guide-item-icon">☼</span><b>屏幕、状态与电量</b><span class="guide-item-desc">字号、排版、充电和低电量提醒说明</span></button>
-        <button class="guide-item" type="button" data-guide-topic="alarm"><span class="guide-item-icon">⏰</span><b>闹钟</b><span class="guide-item-desc">语音设置或取消，全屏倒计时到点提醒</span></button>
-        <button class="guide-item" type="button" data-guide-topic="translate"><span class="guide-item-icon">🌐</span><b>翻译模式</b><span class="guide-item-desc">中英双向直译，双语实时常驻屏幕</span></button>
-        <button class="guide-item" type="button" data-guide-topic="energy"><span class="guide-item-icon">🎴</span><b>每日能量签</b><span class="guide-item-desc">每天摇一摇，抽一签给今天一点能量</span></button>
-        <button class="guide-item" type="button" data-guide-topic="breathing"><span class="guide-item-icon">◉</span><b>呼吸训练</b><span class="guide-item-desc">跟随圆球吸气 4 秒、呼气 6 秒</span></button>
-        <button class="guide-item" type="button" data-guide-topic="modes"><span class="guide-item-icon">✨</span><b>故事、百科与陪伴</b><span class="guide-item-desc">讲故事、百科问答、心情陪伴等玩法</span></button>
-        <button class="guide-item guide-help-link" type="button" data-open-help><span class="guide-item-icon">?</span><b>更多使用帮助</b><span class="guide-item-desc">查看产品基础、联网、电量与功能问答</span></button>
+      <div class="guide-category-tabs" role="tablist" aria-label="使用指南分类">
+        <button class="guide-category-tab on" type="button" role="tab" aria-selected="true" aria-controls="guide-category-basic" data-guide-category-tab="basic">基础操作（6）</button>
+        <button class="guide-category-tab" type="button" role="tab" aria-selected="false" aria-controls="guide-category-feature" data-guide-category-tab="feature">功能玩法（5）</button>
       </div>
+      <div class="guide-list guide-category-panel on" id="guide-category-basic" role="tabpanel" data-guide-category-panel="basic">
+        <button class="guide-item" type="button" data-guide-topic="power"><span class="guide-item-icon">⏻</span><b>开机与关机</b></button>
+        <button class="guide-item" type="button" data-guide-topic="dialogue"><span class="guide-item-icon">💬</span><b>唤醒 Lukie 与对话</b></button>
+        <button class="guide-item" type="button" data-guide-topic="connect"><span class="guide-item-icon">📶</span><b>WiFi 与 4G 联网</b></button>
+        <button class="guide-item" type="button" data-guide-topic="volume"><span class="guide-item-icon">🔊</span><b>音量控制</b></button>
+        <button class="guide-item" type="button" data-guide-topic="screen"><span class="guide-item-icon">Aa</span><b>屏幕字号和亮度调整</b></button>
+        <button class="guide-item" type="button" data-guide-topic="battery"><span class="guide-item-icon">🔋</span><b>电量查看</b></button>
+      </div>
+      <div class="guide-list guide-category-panel" id="guide-category-feature" role="tabpanel" data-guide-category-panel="feature" hidden>
+        <button class="guide-item" type="button" data-guide-topic="alarm"><span class="guide-item-icon">⏰</span><b>闹钟设置</b></button>
+        <button class="guide-item" type="button" data-guide-topic="translate"><span class="guide-item-icon">🌐</span><b>翻译模式</b></button>
+        <button class="guide-item" type="button" data-guide-topic="energy"><span class="guide-item-icon">🎴</span><b>每日能量签</b></button>
+        <button class="guide-item" type="button" data-guide-topic="breathing"><span class="guide-item-icon">◉</span><b>呼吸训练</b></button>
+        <button class="guide-item" type="button" data-guide-topic="daily"><span class="guide-item-icon">✨</span><b>日常对话</b></button>
+      </div>
+      <button class="guide-item guide-help-link guide-help-wide" type="button" data-open-help><span class="guide-item-icon">?</span><b>更多使用帮助</b><span class="mine-row-arrow">›</span></button>
     </div>
   </div>
 
@@ -874,32 +884,9 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
     </div>
   </div>
 
-  <div class="scr" id="guide-dialogue">
-    <div class="guide-dialogue-page">
-      <button class="gallery-back" id="guide-dialogue-back" aria-label="返回使用指南">‹</button>
-      <h1 class="guide-dialogue-head">与 Lukie 对话</h1>
-      <p class="guide-dialogue-intro">两种方式都可以唤醒 Lukie，开始一段自然对话。</p>
-      <div class="guide-dialogue-steps">
-        <article class="guide-dialogue-step"><span class="guide-dialogue-num">1</span><div class="guide-dialogue-step-content"><b>语音唤醒 Lukie</b><p>直接说「Hi, Lukie」，即可唤醒设备并开始对话。</p><div class="guide-dialogue-gif-placeholder" aria-label="步骤 1 GIF 占位">GIF 1</div></div></article>
-        <article class="guide-dialogue-step"><span class="guide-dialogue-num">2</span><div class="guide-dialogue-step-content"><b>按住右键开始对话</b><p>按住右键，出现小耳朵，即可开始对话；说完后松开右键。</p><div class="guide-dialogue-gif-placeholder" aria-label="步骤 2 GIF 占位">GIF 2</div></div></article>
-      </div>
-    </div>
-  </div>
-
-  <div class="scr" id="guide-wifi">
-    <div class="guide-wifi-page">
-      <button class="gallery-back" id="guide-wifi-back" aria-label="返回使用指南">‹</button>
-      <div class="bind-steps">
-        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">1</div><div class="bind-copy"><b>确认 Lukie 已开机</b><span>长按设备左侧按键 3 秒，看到头部指示灯亮起。</span></div></div><div class="bind-shot power" aria-hidden="true"></div></div>
-        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">2</div><div class="bind-copy"><b>找到 Lukie-xxxx 热点</b><span>打开手机 Wi-Fi，在网络列表中选择 Lukie-xxxx。</span></div></div><div class="bind-shot hotspot" aria-hidden="true"></div></div>
-        <div class="bind-step"><div class="bind-step-main"><div class="bind-num">3</div><div class="bind-copy"><b>选择 Wi-Fi 并连接</b><span>选择家庭 2.4G Wi-Fi，输入密码完成联网。</span></div></div><div class="bind-shot wifi" aria-hidden="true"></div></div>
-      </div>
-    </div>
-  </div>
-
   <div class="scr" id="help-center">
     <div class="help-center-page">
-      <div class="help-center-head"><button class="gallery-back" id="help-center-back" aria-label="返回我的">‹</button><h1>帮助中心</h1></div>
+      <div class="help-center-head"><button class="gallery-back" id="help-center-back" aria-label="返回我的">‹</button><h1>更多使用帮助</h1></div>
       <section class="help-group">
         <h2 class="help-group-title">产品基础</h2>
         <details class="help-question" open><summary>Lukie 的尺寸和重量是多少？</summary><div class="help-answer"><p>Lukie 尺寸为 750mm × 600mm × 230mm，净重 57g。</p></div></details>
@@ -1455,33 +1442,129 @@ function openGuide(){
   $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
   go('guide-detail');
 }
+// 使用指南详情统一使用定稿文案，便于后续集中替换 GIF 素材。
 const guideTopics={
- power:{title:'开机、唤醒与关机',intro:'三种基础操作，统一使用唤醒词「Hi Luki」。',steps:[['开机','长按设备左侧按键 3 秒，看到屏幕或头部指示灯亮起后松开。'],['语音唤醒','说「Hi Luki」，听到回应后直接说出问题或指令；「你好小智」已不再使用。'],['按键唤醒','按住右键，屏幕出现小耳朵后开始说话，说完松开右键。'],['关机','同时长按左键和右键 3 秒，等待屏幕关闭。']]},
- voice:{title:'语音控制',intro:'无需进入设置页，直接说出指令即可完成常用调节。',steps:[['音量','说「声音大一点 / 小一点」或「音量调到 50%」，Lukie 会即时反馈。'],['亮度','说「亮一点 / 暗一点」或「亮度调到 60%」，屏幕亮度立即变化。'],['文字模式','说「打开文字模式 / 关闭文字模式」，切换屏幕文字显示。'],['字号','说「字号调大一点 / 调小一点」，按小、中、大三档逐档切换。'],['翻译模式','说「进入翻译模式」开启，说「退出翻译」关闭。']],note:'语音调节后，快捷设置中的音量、亮度、文字模式和字号数值会同步更新。'},
- quick:{title:'快捷设置',intro:'左右键同时按下即可进入，五项设置按一下就生效。',steps:[['进入快捷设置','同时按下左键和右键；已优化同时按下的判定，更容易进入。'],['选择项目','左右键移动焦点，选中项会高亮显示，并带按压反馈。'],['立即调整','依次可调音量、亮度、文字模式、字号；按确认键或停留即可生效。'],['退出','再次同时按左右键，或等待页面自动收起，返回当前功能。']],note:'音量、亮度、文字模式和字号在这里的变化，会与语音控制保持同步。'},
- translate:{title:'翻译模式',intro:'适合亲子对照交流，中英文会同时显示且译文不会自动消失。',steps:[['开启','唤醒后说「进入翻译模式」。屏幕出现翻译模式提示后即可开始。'],['实时翻译','中文直译英文、英文直译中文；原文与译文双语实时上屏。'],['对照查看','每轮译文都会常驻屏幕，不会因下一句话到来而消失，方便回看。'],['退出','说「退出翻译」，屏幕回到普通对话模式。']]},
- energy:{title:'每日能量签',intro:'每天摇一摇抽一签，给一天一个轻松的开始。',steps:[['开始摇签','在首页或功能入口点击「每日能量签」，按提示摇动设备。'],['等待动画','屏幕播放摇签动画，动画结束后自动揭晓签文。'],['查看签文','阅读当天的能量签文；每天可抽取 1 次，次日自动刷新。']]},
- breathing:{title:'呼吸训练',intro:'跟随屏幕圆球的大小和节奏，完成一轮平稳呼吸。',steps:[['启动训练','唤醒后说「开始呼吸训练」，或从使用指南进入呼吸模式。'],['吸气 4 秒','圆球逐渐变大时吸气，持续 4 秒。'],['呼气 6 秒','圆球逐渐变小时呼气，持续 6 秒；跟随循环节奏即可。'],['结束训练','完成需要的轮次后，点击结束或说「停止呼吸训练」。']]},
- alarm:{title:'闹钟',intro:'用一句话设置提醒，到点以声音和屏幕提醒你。',steps:[['设置闹钟','说「明天早上 7 点叫我」或「10 分钟后提醒我」，确认时间后开始倒计时。'],['查看倒计时','设置成功后屏幕全屏显示剩余时间，返回其他功能也会保留提醒。'],['到点提醒','倒计时结束响铃并显示提醒内容，按任意键或回应后停止响铃。'],['取消闹钟','说「取消闹钟」或「取消明早 7 点的闹钟」，确认后立即取消。']]},
- connect:{title:'WiFi 联网与激活',intro:'扫描中、连接中、已连接全程有全屏提示，并配有女声语音引导。',steps:[['扫描中','打开配网流程后等待设备扫描附近网络，屏幕持续显示「扫描中」。'],['连接设备热点','手机连接热点「I.Luki-XXXX」，屏幕明确提示「手机连接此热点进行配网」。'],['连接家庭 WiFi','在 App 中选择家庭 2.4G WiFi 并输入密码，设备屏幕显示「连接中」。'],['确认已连接','连接成功后屏幕显示「已连接」，并播放女声提示；失败时按提示重试。'],['输入激活码','激活码直接显示在 Lukie 屏幕上，请在 iluki app 中输入激活码完成激活。']]},
- display:{title:'屏幕、状态与电量',intro:'屏幕文字、状态栏和电量提示已统一优化，信息更清楚。',steps:[['字号与排版','屏幕文字提供小、中、大三档字号，排版和清晰度与国际版保持一致。'],['状态栏','时间与电量左右对齐展示；充电时显示白色闪电图标并提供震动反馈。'],['充满提示','电量充满后仍保留充电标识，方便确认设备状态。'],['低电量提醒','电量降至 20% 及以下才提醒；电量充足时不会误报「电量低」。']]},
- modes:{title:'故事、百科与陪伴',intro:'在普通对话中直接提出需求，Lukie 会进入对应的互动方式。',steps:[['讲故事模式','说「讲一个关于恐龙的故事」，Lukie 会按主题讲述并与孩子互动。'],['百科问答模式','直接提问自然、科学、生活等问题，Lukie 会用适合孩子的方式解释。'],['心情陪伴模式','说出「我有点难过」等感受，Lukie 会先回应情绪，再提供温和陪伴。'],['随时切换','不需要退出当前模式，直接说出新的需求即可切换；说「Hi Luki」重新唤醒。']]}
+  power:{
+    title:'开机与关机',
+    intro:'设备的开机与关机均通过左键完成，屏幕亮起或关闭代表设备当前的运行状态。',
+    steps:[
+      ['开机','长按设备左键 3 秒，等待屏幕亮起后松开。'],
+      ['关机','长按设备左键 3 秒，等待屏幕关闭后松开。']
+    ]
+  },
+  dialogue:{
+    title:'唤醒 Lukie 与对话',
+    intro:'设备支持语音唤醒和右键唤醒两种对话方式，可根据使用场景随时与 Lukie 开聊。',
+    steps:[
+      ['语音唤醒','说「Hi Lukie」，听到 Lukie 回应后，即可直接说出想对 Lukie 说的话。'],
+      ['按键唤醒','按住右键不松开，屏幕出现一只小耳朵，就表示 Lukie 正在聆听，此时即可开始说话，说完后松开右键。']
+    ]
+  },
+  connect:{
+    title:'WiFi 与 4G 联网',
+    intro:'4G + WiFi 版支持两种联网方式，但不能自动切换网络；纯 WiFi 版仅需完成 WiFi 配置，无需切换联网模式。',
+    steps:[
+      ['按键切换联网模式','4G + WiFi 版开机时，长按左键 3 秒开机，再快速双击左键，即可切换 4G / WiFi 联网模式。'],
+      ['使用 4G','切换至 4G 模式后，设备会自动联网。'],
+      ['使用 WiFi','在手机的网络列表中找到「Lukie-XX」的热点并连接。'],
+      ['连接家庭 WiFi','进入配网页面，选择需要连接的 WiFi，输入 WiFi 密码即可完成连接。']
+    ]
+  },
+  volume:{
+    title:'音量控制',
+    intro:'音量支持语音和按键两种调整方式；语音可进行增减或百分比精确调节，按键可在快捷设置中调整。',
+    steps:[
+      ['通过语音调整','唤醒 Lukie 后，直接说「声音大一点」或「声音小一点」，即可调整音量，还可以说「声音调到 60%」进行精确调整。'],
+      ['通过按键调整','同时按一下左键和右键进入快捷设置；按左键上下翻动并选中「音量」，再同时按一下左右键进入调整界面；按住左键调小音量，按右键调大音量。调整完成后，同时按一下左右键返回项目列表；选择「退出」并确认，即可回到普通对话模式。']
+    ]
+  },
+  screen:{
+    title:'屏幕字号和亮度调整',
+    intro:'屏幕字号、文字模式和亮度均支持语音与按键调整，相关选项也可以在快捷设置中统一管理。',
+    steps:[
+      ['通过语音调整','唤醒 Lukie 后，直接说出调整需求，例如「字号调大一点」「亮度调低一点」或「打开文字模式」。'],
+      ['通过按键调整','同时按一下左键和右键进入快捷设置；按左键上下翻动，选择屏幕字号、文字模式或屏幕亮度，再同时按一下左右键进入对应的调整界面；使用左键调暗，使用右键调亮。调整完成后，同时按一下左右键返回项目列表；选择「退出」并确认，即可回到普通对话模式。']
+    ]
+  },
+  battery:{
+    title:'电量查看',
+    intro:'屏幕状态栏会展示时间和当前电量，并通过充电状态与低电量提醒，帮助你及时了解设备续航。',
+    steps:[
+      ['屏幕查看 Lukie 电量','可通过屏幕状态栏查看时间、当前电量。'],
+      ['充电提示','设备充电时，屏幕右上角会显示对应的充电状态提示。'],
+      ['低电量提醒','电量较低时，设备会主动提醒及时充电。']
+    ]
+  },
+  alarm:{
+    title:'闹钟设置',
+    intro:'只需一句话即可设置、查看或取消闹钟。闹钟仅支持 24 小时内的单次提醒，同一时间只能有 1 个闹钟生效。',
+    steps:[
+      ['语音设置闹钟','唤醒 Lukie 后，直接说出提醒时间和事项，例如「帮我设置 2 分钟后写作业的闹钟」「Lukie，2 分钟后提醒我」或「设置 11 点 28 分的闹钟」。'],
+      ['查看倒计时','设置成功后，可在屏幕上查看倒计时和闹钟事项。'],
+      ['取消闹钟','唤醒 Lukie 后，说「取消闹钟」即可。']
+    ]
+  },
+  translate:{
+    title:'翻译模式',
+    intro:'翻译模式支持中英双向实时翻译，原文与译文会双语同屏展示，方便即时交流和对照查看。',
+    steps:[
+      ['语音进入翻译模式','对 Lukie 说「Hi Lukie，进入翻译模式」，Lukie 屏幕上出现「已开启翻译模式」的提示后，即可开始。'],
+      ['实时翻译','中文直译英文、英文直译中文；原文与译文双语实时上屏。'],
+      ['对照查看','在屏幕上对照查看原文与译文。'],
+      ['退出翻译模式','说「退出翻译模式」，即可回到普通对话模式。']
+    ]
+  },
+  energy:{
+    title:'每日能量签',
+    intro:'每日能量签会随机生成一则签文，并在 Lukie 屏幕上展示抽签结果与对应内容。',
+    steps:[
+      ['按键进入抽签模式','连续点击 3 次 Lukie 的肚子，进入每日能量签模式。'],
+      ['自动摇签','进入模式后，Lukie 会自动开始摇签。'],
+      ['查看能量签','屏幕会展示 Lukie 为你摇到的能量签，以及对应的签文。']
+    ]
+  },
+  breathing:{
+    title:'呼吸训练',
+    intro:'呼吸训练会通过屏幕圆球的动态节奏引导吸气与呼气，帮助你完成一轮平稳呼吸。',
+    steps:[
+      ['按键进入呼吸训练','长按 Lukie 的肚子 3 秒，进入呼吸训练模式。'],
+      ['跟随 Lukie 训练','屏幕上的圆圈逐渐变大时吸气，逐渐变小时呼气，跟随循环节奏即可。'],
+      ['退出呼吸训练','任意按一下左键或右键，即可退出并回到普通对话模式。']
+    ]
+  },
+  daily:{
+    title:'日常对话',
+    intro:'普通对话已包含故事、百科问答和疗愈陪伴等多种玩法，无需进入或退出单独的功能模式。',
+    steps:[
+      ['故事','唤醒 Lukie 后，直接说出想听的故事或主题，例如「给我讲一个关于恐龙的故事」。'],
+      ['百科问答','直接提出自然、科学或生活等方面的问题。'],
+      ['疗愈陪伴','直接向 Lukie 说出自己的感受或想聊的话题。'],
+      ['继续对话','无需进入或退出单独模式，按照普通对话方式与 Lukie 交流即可。']
+    ]
+  }
 };
 function openGuideTopic(key){
   const topic=guideTopics[key]; if(!topic)return;
   $('#guide-topic-title').textContent=topic.title; $('#guide-topic-intro').textContent=topic.intro;
-  $('#guide-topic-content').innerHTML=`<section class="guide-topic-block"><h2>操作步骤</h2><div class="guide-topic-steps">${topic.steps.map((step,index)=>`<article class="guide-topic-step"><span class="guide-topic-num">${index+1}</span><div class="guide-topic-step-copy"><b>${step[0]}</b><p>${step[1]}</p><div class="guide-topic-gif" aria-label="${topic.title}步骤 ${index+1} GIF 占位">GIF 占位 · 步骤 ${index+1}</div></div></article>`).join('')}</div>${topic.note?`<div class="guide-topic-note">${topic.note}</div>`:''}</section>`;
+  // 每个详情页仅保留一个 GIF 占位，由动效制作人员决定最终素材数量。
+  $('#guide-topic-content').innerHTML=`<section class="guide-topic-block"><h2>操作步骤</h2><div class="guide-topic-steps">${topic.steps.map((step,index)=>`<article class="guide-topic-step"><span class="guide-topic-num">${index+1}</span><div class="guide-topic-step-copy"><b>${step[0]}</b><p>${step[1]}</p></div></article>`).join('')}</div><div class="guide-topic-gif" aria-label="${topic.title} GIF 占位">GIF 占位</div></section>`;
   go('guide-topic');
 }
+// 使用分类切换控制首屏卡片数量，避免 12 个入口形成过长页面。
+$$('[data-guide-category-tab]').forEach(button=>button.addEventListener('click',()=>{
+  const category=button.dataset.guideCategoryTab;
+  $$('[data-guide-category-tab]').forEach(tab=>{
+    const isActive=tab.dataset.guideCategoryTab===category;
+    tab.classList.toggle('on',isActive);
+    tab.setAttribute('aria-selected',String(isActive));
+  });
+  $$('[data-guide-category-panel]').forEach(panel=>{
+    const isActive=panel.dataset.guideCategoryPanel===category;
+    panel.classList.toggle('on',isActive);
+    panel.hidden=!isActive;
+  });
+}));
 $$('[data-guide-topic]').forEach(item=>item.addEventListener('click',()=>openGuideTopic(item.dataset.guideTopic)));
-function openWifiGuide(){
-  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
-  go('guide-wifi');
-}
-function openDialogueGuide(){
-  $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
-  go('guide-dialogue');
-}
 function openHelpCenter(){
   $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
   go('help-center');
@@ -1502,8 +1585,6 @@ function populateProfileEditor(){
 }
 document.addEventListener('click',event=>{
   if(event.target.closest('[data-open-guide]')){openGuide();return;}
-  if(event.target.closest('[data-open-dialogue]')){openDialogueGuide();return;}
-  if(event.target.closest('[data-open-wifi]')){openWifiGuide();return;}
   if(event.target.closest('[data-open-help]')){openHelpCenter();return;}
   if(event.target.closest('[data-open-account]')){openAccountManagement();return;}
   if(!event.target.closest('[data-open-profile]'))return;
@@ -1534,8 +1615,6 @@ $('#guide-detail-back').addEventListener('click',()=>{
   renderMineTab();
 });
 $('#guide-topic-back').addEventListener('click',()=>go('guide-detail'));
-$('#guide-dialogue-back').addEventListener('click',()=>go('guide-detail'));
-$('#guide-wifi-back').addEventListener('click',()=>go('guide-detail'));
 $('#help-center-back').addEventListener('click',()=>{
   go('home');
   $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
