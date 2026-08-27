@@ -570,7 +570,6 @@ body{font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;backgro
   <div class="grp">我的</div>
   <button class="pbtn" id="btn-mine-home">我的</button>
   <button class="pbtn" id="btn-profile-detail">我的-宝贝档案</button>
-  <button class="pbtn" id="btn-account-management">我的-账号管理</button>
   <button class="pbtn" id="btn-system-settings">我的-系统设置</button>
   <button class="pbtn" id="btn-guide-detail">我的-使用指南</button>
   <div class="pnote">启动页 → 欢迎页 → 家长/监护人身份确认 → 登录或注册 → 家长授权 → 账号注册成功 → 设备联网 → 设备激活 → 宝贝档案 → 交接仪式 → 首页新手引导 → 首日态（仅初见明信片）→ 首页日常态（无数据 / 有数据 / 有高危数据）→ 成长高光明信片图库 → 明信片图片详情。</div>
@@ -1693,11 +1692,6 @@ $('#btn-mine-home').addEventListener('click',()=>{
   $$('.tab').forEach(tab=>tab.classList.toggle('on',tab.dataset.tab==='mine'));
   renderMineTab();
   go('home');
-});
-$('#btn-account-management').addEventListener('click',()=>{
-  $$('.home-state').forEach(x=>x.classList.remove('on'));
-  clearCoachFocus();$('#coach').classList.remove('on');
-  openAccountManagement();
 });
 $('#btn-system-settings').addEventListener('click',()=>{
   $$('.home-state').forEach(x=>x.classList.remove('on'));
